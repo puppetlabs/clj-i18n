@@ -1,0 +1,60 @@
+# i18n
+
+A Clojure library designed to make i18n easier. Provides convenience
+functions to access the JVM's localization facilities and some guidance on
+how to use the GNU `gettext` tools.
+
+The `main.clj` in this repo contains some simple code that demonstrates how
+to use the `tr` function. Before you can use it, you need to run `make
+msgfmt` to generate the necessary `ResourceBundles`.
+
+Then you can do `lein run` or `LANG=de_DE lein run` to look at English and
+German output.
+
+## Developer usage
+
+Any Clojure code that needs to generate human-readable text must use the
+function `puppetlabs.i18n.core/tr` to do so. When you require it into your
+namespace, you *must* call it either `tr` or `i18n/tr` (these are the names
+that `xgettext` will look for when it extracts strings)
+
+You use `tr` very similar to how you use `format`, except that the format
+string must be a valid
+[`java.text.MessageFormat`](https://docs.oracle.com/javase/8/docs/api/java/text/MessageFormat.html)
+pattern. For example, you would write
+
+    (println (tr "It takes {0} women {1} months to have a child" 3 9))
+
+Whenever you make changes to your code, you will need to update the message
+catalog (the file `locales/messages.pot` in your project) by running
+
+    make update-pot
+
+## Translator usage
+
+When a translator gets ready to translate messages, they need to update the
+corresponding `.po` file. For example, to update German translations,
+they'd run
+
+    msgmerge -U locales/de.po locales/messages.pot
+
+and then edit `locales/de.po`
+
+## Release usage
+
+When it comes time to make a release, or if you want to use your code in a
+different locale before then, you need to generate Java `ResourceBundle`
+classes that contain the localized messages. This is done by running `make
+msgfmt` on your project.
+
+## Todo
+
+* allow setting a thread-specific locale, and use that for l10n
+* make running xgettext and msgfmt a leiningen plugin
+* figure out the right project-specific namespace in which to look for the
+  Messages `ResourceBundle` (not just `puppetlabs.i18n`)
+* figure out how to combine the message catalogs of multiple
+  libraries/projects into one at release time (msgcat)
+* add Ring middleware to do language negotiation based on the
+  Accept-Language header and set the per-thread locale accordingly
+* should `ResourceBundle` class files be checked into git ?

@@ -1,0 +1,30 @@
+# German translations for PACKAGE package.
+# Copyright (C) 2015 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# David Lutterkort <lutter@watzmann.net>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-04-21 16:37-0700\n"
+"PO-Revision-Date: 2015-03-26 17:16-0700\n"
+"Last-Translator: David Lutterkort <lutter@watzmann.net>\n"
+"Language-Team: German\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/puppetlabs/i18n/main.clj:14
+msgid "Welcome! This is localized"
+msgstr "Willkommen ! Draußen nur Kännchen"
+
+#: src/puppetlabs/i18n/main.clj:18
+msgid "It took {0} programmers {1} months to implement this"
+msgstr "{0} Programmierer brauchten {1} Monat(e) um das zu implementieren"
+
+#: src/puppetlabs/i18n/main.clj:23
+msgid "There are {0,number,integer} bicycles in Beijing"
+msgstr "In Peking gibt es {0,number,integer} Fahrräder"
