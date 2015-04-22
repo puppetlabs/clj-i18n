@@ -43,10 +43,7 @@
   (get-bundle (string-as-locale loc)))
 
 (defmethod get-bundle java.util.Locale [loc]
-  (let [cl (.getContextClassLoader (Thread/currentThread))]
-    ;; @todo lutter 2015-04-21: we need to figure out what package to use,
-    ;; can't stay hardcoded as "puppetlabs.i18n"
-    (java.util.ResourceBundle/getBundle bundle-name loc)))
+  (java.util.ResourceBundle/getBundle bundle-name loc))
 
 ;;; Message lookup/formatting
 (defn lookup
@@ -70,6 +67,8 @@
   patterns are available."
   ([msg args] (fmt (current-locale) msg args))
   ([loc msg args]
+   ;; we might want to cache these MessageFormat's in some way
+   ;; maybe in a size-bounded LRU cache
    (.format (new java.text.MessageFormat msg loc) args)))
 
 (defn tr
