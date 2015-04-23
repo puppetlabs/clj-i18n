@@ -1,26 +1,32 @@
 # The package name of this project
 PROJECT=puppetlabs.i18n
+LOCALES=$(basename $(notdir $(wildcard locales/*.po)))
+PROJECT_DIR=$(subst .,/,$(PROJECT))
+BUNDLE_FILES=$(patsubst %,resources/$(PROJECT_DIR)/Messages_%.class,$(LOCALES))
+SRC_FILES=$(shell find src/ -name \*.clj)
+
+all: update-pot msgfmt
 
 # Update locales/messages.pot
-# This will unconditionally update the pot file, even if no update is needed
-update-pot:
+update-pot: locales/messages.pot
+
+locales/messages.pot: $(SRC_FILES)
 	@find src/ -name \*.clj \
 	    | xgettext --from-code=UTF-8 --language=lisp \
 					-ktr:1 -ki18n/tr:1 \
 					-o locales/messages.pot -f -
 
 # Run msgfmt over all .po files to generate Java resource bundles
-msgfmt: resources/Message_*.class
-	@ls locales/*.po | sed -r -e 's@locales/([a-z_]+)\.po@\1@' > resources/locales.txt
+msgfmt: $(BUNDLE_FILES)
+	@echo $(LOCALES) | tr ' ' '\n' > resources/locales.txt
 
-resources/Message_%.class: locales/%.po
+resources/$(PROJECT_DIR)/Messages_%.class: locales/%.po
 	msgfmt --java2 -d resources -r $(PROJECT).Messages -l $$(basename $< .po) $<
 
 # Translators use this when they update translations; this copies any
 # changes in the pot file into their language-specific po file
-#locales/%.po: locales/messages.pot
-#	touch $@
-#	msgmerge -U $@ $<
+locales/%.po: locales/messages.pot
+	msgmerge -U $@ $< && touch $@
 
 # @todo lutter 2015-04-20: for projects that use libraries with their own
 # translation, we need to combine all their translations into one big po
