@@ -47,6 +47,17 @@ different locale before then, you need to generate Java `ResourceBundle`
 classes that contain the localized messages. This is done by running `make
 msgfmt` on your project.
 
+## Project layout
+
+The (not quite realized) vision is that projects that want to do i18n with
+this library need to have a `locales/` directory for the pot and po
+files. They should all be checked into source control.
+
+During a build, `msgfmt` will put class files into
+`resources/PACKAGE/Message*.class` and create a file
+`resources/locales.txt`; these files are automatically slurped into the
+uberjar and shouldn't require any additional intervention.
+
 ## Todo
 
 * allow setting a thread-specific locale, and use that for l10n
