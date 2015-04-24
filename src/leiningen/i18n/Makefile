@@ -24,7 +24,10 @@ locales/messages.pot: $(SRC_FILES)
 
 # Run msgfmt over all .po files to generate Java resource bundles
 msgfmt: $(BUNDLE_FILES)
-	@echo $(LOCALES) | tr ' ' '\n' > resources/locales.txt
+	@(printf '{\n  :locales ['; \
+	  for l in $(LOCALES); do printf "\"%s\" " $$l; done; \
+	  printf ']\n'; \
+	  printf '  :bundles ["$(PACKAGE).Messages"]\n}\n') > resources/locales.clj
 
 resources/$(PACKAGE_DIR)/Messages_%.class: locales/%.po
 	msgfmt --java2 -d resources -r $(PACKAGE).Messages -l $$(basename $< .po) $<
