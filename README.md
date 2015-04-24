@@ -25,10 +25,17 @@ pattern. For example, you would write
 
     (println (tr "It takes {0} women {1} months to have a child" 3 9))
 
-Whenever you make changes to your code, you will need to update the message
-catalog (the file `locales/messages.pot` in your project) by running
+### Project setup
 
-    make update-pot
+1. Make `puppetlabs.i18n.core` a dependency and a plugin __details on how__
+1. Run `lein i18n init`. This will
+   * put a `Makefile.i18n` into `dev-resources/` in your project and
+   include it into an existing toplevel `Makefile` resp. create a new one
+   that does that
+   * add hooks to the `compile`, `jar` and `uberjar` that will refresh i18n
+     data (equivalent of running `make i18n`)
+1. Before checking in code changes, run `make i18n` (__do we need to
+     require that ?__)
 
 ## Translator usage
 
@@ -61,6 +68,7 @@ uberjar and shouldn't require any additional intervention.
 ## Todo
 
 * allow setting a thread-specific locale, and use that for l10n
+* propagating locale to background threads
 * make running xgettext and msgfmt a leiningen plugin
 * figure out the right project-specific namespace in which to look for the
   Messages `ResourceBundle` (not just `puppetlabs.i18n`)
