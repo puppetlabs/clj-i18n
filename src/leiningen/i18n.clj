@@ -2,7 +2,8 @@
   (:require [leiningen.core.main :as l]
             [leiningen.core.eval :as e]
             [clojure.java.io :as io]
-            [clojure.pprint :as pprint]))
+            [clojure.pprint :as pprint]
+            [clojure.java.shell :as sh :refer [sh]]))
 
 (defn help
   []
@@ -13,6 +14,7 @@
 
   The following subtasks are supported:
     init  - add i18n tool support to the project, then run 'make help'
+    make  - invoke 'make i18n'
 ")
 
 (defn path-join
@@ -97,14 +99,23 @@
   (edit-toplevel-makefile project)
   (edit-gitignore project))
 
+(defn i18n-make
+  [project]
+  (l/info "Running 'make i18n'")
+  (sh "make" "i18n"))
+
 (defn abort
   [& rest]
   (apply l/abort (concat '("Error:") rest (list "\n\n" (help)))))
 
 (defn i18n
-  [project & keys]
+  [project command]
 
-  (condp = (first keys)
+  (if-not (:root project)
+    (abort "The i18n plugin can only be run inside a project"))
+
+  (condp = command
     nil       (abort "You need to provide a subcommand")
     "init"    (i18n-init project)
+    "make"    (i18n-make project)
     (abort "Unexpected command:" (first keys))))
