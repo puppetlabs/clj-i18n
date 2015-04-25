@@ -1,4 +1,5 @@
 (ns leiningen.i18n
+  "Plugin for i18n tasks. Start by using i18n init"
   (:require [leiningen.core.main :as l]
             [leiningen.core.eval :as e]
             [clojure.java.io :as io]
@@ -7,9 +8,8 @@
 
 (defn help
   []
-  "  Plugin for i18n tasks. Start by using i18n init
 
-  The i18n tooling expects that you have GNU make and the gettext tools
+" The i18n tooling expects that you have GNU make and the gettext tools
   installed.
 
   The following subtasks are supported:
@@ -118,4 +118,4 @@
     nil       (abort "You need to provide a subcommand")
     "init"    (i18n-init project)
     "make"    (i18n-make project)
-    (abort "Unexpected command:" (first keys))))
+    (abort "Unexpected command:" command)))
