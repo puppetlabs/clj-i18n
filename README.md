@@ -16,7 +16,11 @@ German output.
 Any Clojure code that needs to generate human-readable text must use the
 function `puppetlabs.i18n.core/tr` to do so. When you require it into your
 namespace, you *must* call it either `tr` or `i18n/tr` (these are the names
-that `xgettext` will look for when it extracts strings)
+that `xgettext` will look for when it extracts strings) Typically, you
+would have this in your namespace declaration
+
+    (ns puppetlabs.myproject
+      (:require [puppetlabs.i18n.core :as i18n :refer [tr]]))
 
 You use `tr` very similar to how you use `format`, except that the format
 string must be a valid
@@ -27,15 +31,28 @@ pattern. For example, you would write
 
 ### Project setup
 
-1. Make `puppetlabs.i18n.core` a dependency and a plugin __details on how__
+1. In your `project.clj`, add `puppetlabs/i18n` to the `:dependencies` and
+   to the `plugins`
 1. Run `lein i18n init`. This will
    * put a `Makefile.i18n` into `dev-resources/` in your project and
-   include it into an existing toplevel `Makefile` resp. create a new one
-   that does that
-   * add hooks to the `compile`, `jar` and `uberjar` that will refresh i18n
+     include it into an existing toplevel `Makefile` resp. create a new one
+     that does that. You should check these files into you source control
+     system.
+   * add hooks to the `compile` task that will refresh i18n
      data (equivalent of running `make i18n`)
-1. Before checking in code changes, run `make i18n` (__do we need to
-     require that ?__)
+
+This setup will ensure that the file `locales/messages.pot` and the
+translations in `locales/LANG.po` are updated every time you compile your
+project. Compiling your project will also regenerate the Java
+`ResourceBundle` classes that your code needs to do translations.
+
+You can manually regenerate these files by running `make i18n`. Additional
+information about the Make targets is available through running `make
+help`.
+
+The i18n tools maintain files in two directories: message catalogs in
+`locales/` and compiled translations in `resources/`. You should check the
+files in `locales/` into source control, but not the ones in `resources/`.
 
 ## Translator usage
 
@@ -43,9 +60,13 @@ When a translator gets ready to translate messages, they need to update the
 corresponding `.po` file. For example, to update German translations,
 they'd run
 
-    msgmerge -U locales/de.po locales/messages.pot
+    make locales/de.po
 
-and then edit `locales/de.po`
+and then edit `locales/de.po`. The plugin actually performs the `make`
+invocation above everytime you compile the project, so you should only have
+to do it manually to add a PO file for a new locale. Translators should be
+able to work off the PO files that are checked into source control, as they
+are always kept 'fresh' by the plugin.
 
 ## Release usage
 
@@ -54,26 +75,11 @@ different locale before then, you need to generate Java `ResourceBundle`
 classes that contain the localized messages. This is done by running `make
 msgfmt` on your project.
 
-## Project layout
-
-The (not quite realized) vision is that projects that want to do i18n with
-this library need to have a `locales/` directory for the pot and po
-files. They should all be checked into source control.
-
-During a build, `msgfmt` will put class files into
-`resources/PACKAGE/Message*.class` and create a file
-`resources/locales.txt`; these files are automatically slurped into the
-uberjar and shouldn't require any additional intervention.
-
 ## Todo
 
 * allow setting a thread-specific locale, and use that for l10n
 * propagating locale to background threads
-* make running xgettext and msgfmt a leiningen plugin
-* figure out the right project-specific namespace in which to look for the
-  Messages `ResourceBundle` (not just `puppetlabs.i18n`)
 * figure out how to combine the message catalogs of multiple
   libraries/projects into one at release time (msgcat)
 * add Ring middleware to do language negotiation based on the
   Accept-Language header and set the per-thread locale accordingly
-* should `ResourceBundle` class files be checked into git ?
