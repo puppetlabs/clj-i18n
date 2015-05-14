@@ -24,16 +24,32 @@
   (first (:bundles (info))))
 
 ;;; Handling the current locale
-(defn global-locale
+(defn system-locale
   "Get the globally set locale"
   []
   (. java.util.Locale getDefault))
 
-(defn current-locale []
-  ;; @todo lutter 2015-04-21: prefer a thread-local locale over the
-  ;; global (JVM-wide) locale. Requires that we have some logic around
-  ;; setting/getting per-thread locale
-  (global-locale))
+(def ^:dynamic *locale*
+  "The current user locale. You should not modify this variable
+  directly. Instead, call user-locale to read its value and use
+  with-user-locale to evaluate forms with the user locale set to a specific
+  value"
+  nil)
+
+(defmacro with-user-locale
+  "Evaluate body with the user locale set to locale"
+  [locale & body]
+  `(let [locale# ~locale]
+     (if (instance? java.util.Locale locale#)
+       (binding [*locale* locale#] ~@body)
+       (throw (IllegalArgumentException.
+               (str "Expected java.util.Locale but got "
+                    (.getName (.getClass locale#))))))))
+
+(defn user-locale []
+  "Return the user's preferred locale. If none is set, return the system
+  locale"
+  (or *locale* (system-locale)))
 
 ;; @todo lutter 2015-04-21: there are various formats of string locales
 ;; we need to make sure we have the right one. For example, "en_US" leads
@@ -57,7 +73,7 @@
   "Look msg up in the resource bundle for loc. If there is no resource
   bundle for it, or the resource bundle does not contain an entry for msg,
   return msg itself"
-  ([msg] (lookup (current-locale) msg))
+  ([msg] (lookup (user-locale) msg))
   ([loc msg]
    (try
      (.getString (get-bundle loc) msg)
@@ -72,7 +88,7 @@
 
   See the documentation for java.text.MessageFormat for the details of what
   patterns are available."
-  ([msg args] (fmt (current-locale) msg args))
+  ([msg args] (fmt (user-locale) msg args))
   ([loc msg args]
    ;; we might want to cache these MessageFormat's in some way
    ;; maybe in a size-bounded LRU cache
@@ -81,5 +97,5 @@
 (defn tr
   "Translate a message into the current locale, interpolating as needed"
   [msg & args]
-  (let [loc (current-locale)]
+  (let [loc (user-locale)]
     (fmt loc (lookup loc msg) (to-array args))))
