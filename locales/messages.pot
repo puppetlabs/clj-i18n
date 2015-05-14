@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-21 16:37-0700\n"
+"POT-Creation-Date: 2015-05-14 11:52-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,14 +17,14 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/puppetlabs/i18n/main.clj:14
+#: src/puppetlabs/i18n/main.clj:18
 msgid "Welcome! This is localized"
 msgstr ""
 
-#: src/puppetlabs/i18n/main.clj:18
+#: src/puppetlabs/i18n/main.clj:22
 msgid "It took {0} programmers {1} months to implement this"
 msgstr ""
 
-#: src/puppetlabs/i18n/main.clj:23
+#: src/puppetlabs/i18n/main.clj:27
 msgid "There are {0,number,integer} bicycles in Beijing"
 msgstr ""

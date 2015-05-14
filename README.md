@@ -5,8 +5,8 @@ functions to access the JVM's localization facilities and some guidance on
 how to use the GNU `gettext` tools.
 
 The `main.clj` in this repo contains some simple code that demonstrates how
-to use the `tr` function. Before you can use it, you need to run `make
-msgfmt` to generate the necessary `ResourceBundles`.
+to use the translation functions. Before you can use it, you need to run
+`make msgfmt` to generate the necessary `ResourceBundles`.
 
 Then you can do `lein run` or `LANG=de_DE lein run` to look at English and
 German output.
@@ -14,20 +14,25 @@ German output.
 ## Developer usage
 
 Any Clojure code that needs to generate human-readable text must use the
-function `puppetlabs.i18n.core/tr` to do so. When you require it into your
-namespace, you *must* call it either `tr` or `i18n/tr` (these are the names
+functions `puppetlabs.i18n.core/trs` and `puppetlabs.i18n.core/tru` to do
+so. Use `trs` for messages that should be formatted in the system's locale,
+for example log messages, and `tru` for messages that will be shown to the
+current user, for example an error that happened processing a web request.
+
+When you require `puppetlabs.i18n.core` into your namespace, you *must*
+call it either `trs`/`tru` or `i18n/trs`/`i18n/tru` (these are the names
 that `xgettext` will look for when it extracts strings) Typically, you
 would have this in your namespace declaration
 
     (ns puppetlabs.myproject
-      (:require [puppetlabs.i18n.core :as i18n :refer [tr]]))
+      (:require [puppetlabs.i18n.core :as i18n :refer [trs tru]]))
 
-You use `tr` very similar to how you use `format`, except that the format
-string must be a valid
+You use `trs`/`tru` very similar to how you use `format`, except that the
+format string must be a valid
 [`java.text.MessageFormat`](https://docs.oracle.com/javase/8/docs/api/java/text/MessageFormat.html)
 pattern. For example, you would write
 
-    (println (tr "It takes {0} women {1} months to have a child" 3 9))
+    (println (trs "It takes {0} women {1} months to have a child" 3 9))
 
 ### Project setup
 

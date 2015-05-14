@@ -19,7 +19,8 @@ update-pot: locales/messages.pot
 locales/messages.pot: $(SRC_FILES)
 	@find src/ -name \*.clj \
 	    | xgettext --from-code=UTF-8 --language=lisp \
-					-ktr:1 -ki18n/tr:1 \
+					-ktrs:1 -ki18n/trs:1 \
+					-ktru:1 -ki18n/tru:1 \
 					-o locales/messages.pot -f -
 
 # Run msgfmt over all .po files to generate Java resource bundles

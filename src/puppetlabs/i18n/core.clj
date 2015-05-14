@@ -94,8 +94,17 @@
    ;; maybe in a size-bounded LRU cache
    (.format (new java.text.MessageFormat msg loc) args)))
 
-(defn tr
-  "Translate a message into the current locale, interpolating as needed"
-  [msg & args]
-  (let [loc (user-locale)]
-    (fmt loc (lookup loc msg) (to-array args))))
+(defn translate
+  "Translate a message into the given locale, interpolating as needed"
+  [loc msg & args]
+  (fmt loc (lookup loc msg) (to-array args)))
+
+(defmacro tru
+  "Translate a message into the user's locale, interpolating as needed"
+  [& args]
+  `(translate (user-locale) ~@args))
+
+(defmacro trs
+  "Translate a message into the system locale, interpolating as needed"
+  [& args]
+  `(translate (system-locale) ~@args))
