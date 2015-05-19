@@ -1,27 +1,51 @@
 (ns puppetlabs.i18n.core
   (:gen-class)
-  (:require [clojure.java.io :as io]))
+  (:require [clojure.java.io :as io]
+            [clojure.set]))
 
 ;;; General setup/info
-(defn info
-  "Read the locales.clj file created by our makefile and return the
-  resulting map"
+(defn info-files
+  "Find all locales.clj files on the context class path and return them as
+  a seq of URLs"
   []
-  ;; this data won't change while the program is running and should be
-  ;; memoized
-  (read-string (slurp (io/resource "locales.clj"))))
+  (-> (Thread/currentThread)
+           .getContextClassLoader
+           (.getResources "locales.clj")
+           enumeration-seq))
+
+(defn infos
+  "Read all the locales.clj files on the classpath and return them as an
+  array of maps. There is one locales.clj file per Clojure project.
+
+  Each entry in the map uses the following keys:
+    :locales - set of the locale names in which translations are available
+    :package - the toplevel package name (lein project name) for this library
+    :bundle  - the name of the resource bundle"
+  []
+  ;; this will not change over the lifetime of the program and should be
+  ;; memoized; there are a few thunks involving infos that could be
+  ;; precomputed in a similar manner
+  (map #(-> % slurp read-string) (info-files)))
+
+(defn info-map
+  "Turn the result of infos into a map mapping the package name to locales
+  and bundle name"
+  []
+  (reduce
+   (fn [map item]
+     (assoc map (:package item)
+            (select-keys item [:locales :bundle])))
+   {} (infos)))
 
 (defn available-locales
   "Return a list of all the locales for which we have translations based on
   the information in locales.clj generated at compile time"
   []
-  (:locales (info)))
-
-(defn bundle-name
-  "Return the name of the resource bundle we should use based on the
-  information in locales.clj"
-  []
-  (first (:bundles (info))))
+  ;; intersection would be another option; in a well-managed code base, the
+  ;; assumption is that all bundles are available in the same locales.
+  ;; If there are differences, we make a best effort to give users as much
+  ;; in their desired language as we can
+  (apply clojure.set/union (map :locales (infos))))
 
 ;;; Handling the current locale
 (defn system-locale
@@ -58,29 +82,42 @@
   (java.util.Locale/forLanguageTag loc))
 
 ;;; ResourceBundles
-(defmulti get-bundle
+(defn bundle-for-namespace
+  "Find the name of the ResourceBundle for the given namespace name"
+  [namespace]
+  (:bundle
+   (get (info-map)
+        (first (filter #(.startsWith namespace %)
+                       (reverse (sort-by count (keys (info-map)))))))))
+
+(defn get-bundle
   "Get the java.util.ResourceBundle for the given locale (a string)"
-  class)
-
-(defmethod get-bundle java.lang.String [loc]
-  (get-bundle (string-as-locale loc)))
-
-(defmethod get-bundle java.util.Locale [loc]
-  (java.util.ResourceBundle/getBundle (bundle-name) loc))
+  [namespace loc]
+  (try
+    (let [base-name (bundle-for-namespace namespace)]
+      (and base-name
+           (java.util.ResourceBundle/getBundle base-name loc)))
+    (catch java.lang.NullPointerException e
+      ;; base-name or loc were nil
+      nil)
+    (catch java.util.MissingResourceException e
+      ;; no bundle for the base-name and/or locale
+      nil)))
 
 ;;; Message lookup/formatting
 (defn lookup
-  "Look msg up in the resource bundle for loc. If there is no resource
-  bundle for it, or the resource bundle does not contain an entry for msg,
-  return msg itself"
-  ([msg] (lookup (user-locale) msg))
-  ([loc msg]
-   (try
-     (.getString (get-bundle loc) msg)
-     (catch java.util.MissingResourceException e
-       ;; This gets thrown both when there is no bundle for the given locale
-       ;; and when the bundle exists but does not contain a key for msg
-       msg))))
+  "Look msg up in the resource bundle for namespace in the locale loc. If
+  there is no resource bundle for it, or the resource bundle does not
+  contain an entry for msg, return msg itself"
+  [namespace loc msg]
+  (let [bundle (get-bundle namespace loc)]
+    (if bundle
+      (try
+        (.getString bundle msg)
+        (catch java.util.MissingResourceException e
+          ;; no key for msg
+          msg))
+      msg)))
 
 (defn fmt
   "Use msg as a java.text.MessageFormat and interpolate the args
@@ -95,16 +132,18 @@
    (.format (new java.text.MessageFormat msg loc) args)))
 
 (defn translate
-  "Translate a message into the given locale, interpolating as needed"
-  [loc msg & args]
-  (fmt loc (lookup loc msg) (to-array args)))
+  "Translate a message into the given locale, interpolating as
+  needed. Messages are looked up in the resource bundle associated with the
+  given namespace"
+  [namespace loc msg & args]
+  (fmt loc (lookup namespace loc msg) (to-array args)))
 
 (defmacro tru
   "Translate a message into the user's locale, interpolating as needed"
   [& args]
-  `(translate (user-locale) ~@args))
+  `(translate ~(namespace-munge *ns*) (user-locale) ~@args))
 
 (defmacro trs
   "Translate a message into the system locale, interpolating as needed"
   [& args]
-  `(translate (system-locale) ~@args))
+  `(translate ~(namespace-munge *ns*) (system-locale) ~@args))
