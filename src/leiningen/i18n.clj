@@ -44,8 +44,9 @@
   live. This is the project's group and name in dotted notation. If the
   project has no group, we use 'nogroup'"
   [project]
-  (str (or (:group project) "nogroup") "."
-       (clojure.string/replace (:name project) "/" ".")))
+  (namespace-munge
+   (str (or (:group project) "nogroup") "."
+        (clojure.string/replace (:name project) "/" "."))))
 
 (defn copy-makefile-to-dev-resources
   [project]
