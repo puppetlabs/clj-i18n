@@ -1,12 +1,12 @@
 # i18n
 
-A Clojure library designed to make i18n easier. Provides convenience
-functions to access the JVM's localization facilities and some guidance on
-how to use the GNU `gettext` tools.
+A Clojure library and leiningen plugin to make i18n easier. Provides
+convenience functions to access the JVM's localization facilities and
+automates managing messages and resource bundles.
 
 The `main.clj` in this repo contains some simple code that demonstrates how
 to use the translation functions. Before you can use it, you need to run
-`make msgfmt` to generate the necessary `ResourceBundles`.
+`make` to generate the necessary `ResourceBundles`.
 
 Then you can do `lein run` or `LANG=de_DE lein run` to look at English and
 German output.
@@ -68,10 +68,10 @@ they'd run
     make locales/de.po
 
 and then edit `locales/de.po`. The plugin actually performs the `make`
-invocation above everytime you compile the project, so you should only have
-to do it manually to add a PO file for a new locale. Translators should be
-able to work off the PO files that are checked into source control, as they
-are always kept 'fresh' by the plugin.
+invocation above every time you compile the project, so you should only
+have to do it manually to add a PO file for a new locale. Translators
+should be able to work off the PO files that are checked into source
+control, as they are always kept 'fresh' by the plugin.
 
 ## Release usage
 
@@ -80,11 +80,13 @@ different locale before then, you need to generate Java `ResourceBundle`
 classes that contain the localized messages. This is done by running `make
 msgfmt` on your project.
 
+# Hacking
+
+The code is set up as an ordinary leiningen project, with the one exception
+that you need to run `make` before running `lein test` or `lein run`, as
+there are messages that need to be turned into a message bundle.
+
 ## Todo
 
-* allow setting a thread-specific locale, and use that for l10n
-* propagating locale to background threads
-* figure out how to combine the message catalogs of multiple
-  libraries/projects into one at release time (msgcat)
 * add Ring middleware to do language negotiation based on the
   Accept-Language header and set the per-thread locale accordingly
