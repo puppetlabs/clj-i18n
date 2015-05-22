@@ -21,7 +21,8 @@ locales/messages.pot: $(SRC_FILES)
 	    | xgettext --from-code=UTF-8 --language=lisp \
 					-ktrs:1 -ki18n/trs:1 \
 					-ktru:1 -ki18n/tru:1 \
-					-o locales/messages.pot -f -
+					-o locales/messages.pot -f -; \
+	sed -i -e 's/charset=CHARSET/charset=UTF-8/' locales/messages.pot
 
 # Run msgfmt over all .po files to generate Java resource bundles
 msgfmt: $(BUNDLE_FILES)
