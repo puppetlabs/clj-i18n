@@ -81,6 +81,14 @@
 (defn string-as-locale [loc]
   (java.util.Locale/forLanguageTag loc))
 
+(defn message-locale
+  "The locale of the untranslated messages. This is used as a fallback if
+  we don't have translations for any of the locales that the user would
+  like to have. If you change this, it also needs to be changed in the
+  Makefile that generates resource bundles"
+  []
+  (string-as-locale "en"))
+
 ;;; ResourceBundles
 (defn bundle-for-namespace
   "Find the name of the ResourceBundle for the given namespace name"

@@ -4,11 +4,15 @@
 #   lein i18n init
 #
 
+# The locale in which our messages are written, and for which we therefore
+# have messages without any further effort
+MESSAGE_LOCALE=en
+
 # The name of the package into which tranlsations will be placed
 PACKAGE=puppetlabs.i18n
 LOCALES=$(basename $(notdir $(wildcard locales/*.po)))
 PACKAGE_DIR=$(subst .,/,$(PACKAGE))
-BUNDLE_FILES=$(patsubst %,resources/$(PACKAGE_DIR)/Messages_%.class,$(LOCALES))
+BUNDLE_FILES=$(patsubst %,resources/$(PACKAGE_DIR)/Messages_%.class,$(LOCALES) $(MESSAGE_LOCALE))
 SRC_FILES=$(shell find src/ -name \*.clj)
 
 i18n: setup update-pot msgfmt
@@ -27,13 +31,17 @@ locales/messages.pot: $(SRC_FILES)
 # Run msgfmt over all .po files to generate Java resource bundles
 msgfmt: $(BUNDLE_FILES)
 	@(printf '{\n  :locales #{'; \
-	  for l in $(LOCALES); do printf "\"%s\" " $$l; done; \
+	  printf "\"%s\"" $(MESSAGE_LOCALE); \
+	  for l in $(LOCALES); do printf " \"%s\"" $$l; done; \
 	  printf '}\n'; \
 	  printf '  :package "$(PACKAGE)"\n'; \
 	  printf '  :bundle  "$(PACKAGE).Messages"\n}\n') > resources/locales.clj
 
 resources/$(PACKAGE_DIR)/Messages_%.class: locales/%.po
 	msgfmt --java2 -d resources -r $(PACKAGE).Messages -l $$(basename $< .po) $<
+
+resources/$(PACKAGE_DIR)/Messages_$(MESSAGE_LOCALE).class: locales/messages.pot
+	msgfmt --java2 -d resources -r $(PACKAGE).Messages -l $(MESSAGE_LOCALE) $<
 
 # Translators use this when they update translations; this copies any
 # changes in the pot file into their language-specific po file
