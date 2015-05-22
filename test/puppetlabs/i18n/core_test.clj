@@ -74,3 +74,71 @@
       (is (nil? (bundle-for-namespace "example")))
       (is (= "other.i18n.Messages"
              (bundle-for-namespace "other.i18n.abbott.costello"))))))
+
+(deftest test-as-number
+  (testing "convert number strings properly"
+    (is (= 0.1 (as-number "0.1")))
+    (is (= 1.0 (as-number "1.0")))
+    (is (= 0.5 (as-number 0.5))))
+  (testing "turns garbage into 0"
+    (is (= 0 (as-number "xyz")))
+    (is (= 0 (as-number true)))
+    (is (= 0 (as-number nil)))))
+
+(deftest test-parse-http-accept-header
+  (let [p #(parse-http-accept-header %)]
+    (testing "parses q-values properly"
+      (is (= '(["de-DE" 1]) (p "de-DE")))
+      (is (= '(["de-DE" 0.5]) (p "de-DE;q=0.5")))
+      (is (= '() (p "de-DE;q=0.0")))
+      (is (= '() (p "de-DE;q=garbage"))))
+    (testing "sorts locales properly"
+      (is (= '(["de-DE" 1] ["de" 1]) (p "de-DE, de")))
+      (is (= '(["de-DE" 1.0] ["de" 1]) (p "de-DE;q=1, de")))
+      (is (= '(["de-DE" 1] ["de" 0.9] ) (p "de;q=0.9, de-DE")))
+      (is (= '(["de-DE" 0.8] ["de" 0.7]) (p "de;q=0.7, de-DE;q=0.8")))
+      (is (= '(["de-DE" 0.8] ["de" 0.7]) (p "de-DE;q=0.8 , de;q=0.7, ")))
+      (is (= '(["de" 1] ["en-gb" 0.8] ["en" 0.7])
+             (p "de, en-gb;q=0.8, en;q=0.7"))))))
+
+(deftest test-negotiate-locale
+  (with-redefs
+    [puppetlabs.i18n.core/message-locale #(string-as-locale "oc")]
+    (let [check
+          (fn [exp wanted]
+            (is (= (string-as-locale exp)
+                   (negotiate-locale wanted #{"de" "fr-FR" "en"}))))]
+      (testing "works"
+        (check "de" ["it" "de" "en"])
+        (check "en" ["it" "en" "de"])
+        (check "en" ["en_US" "en" "de"])
+        (check "oc" ["da" "no"]))
+      ;; The next two tests are here to document current behavior, not
+      ;; because that behavior is nevessarily a great idea
+      (testing "country variants for a locale we have are ignored"
+        (check "oc" ["de-CH" "it"]))
+      (testing "generic locale when we have country variant is ignored"
+        (check "fr-FR" ["fr" "fr-FR"])))))
+
+(deftest test-locale-negotiator
+  (with-redefs
+    [puppetlabs.i18n.core/available-locales (fn [] #{"de" "fr-FR" "en"})
+     puppetlabs.i18n.core/message-locale #(string-as-locale "oc")]
+    (let [neg        (locale-negotiator (fn [request] (user-locale)))
+          mk-request (fn [accept]
+                       {:headers {"accept-language" accept}})
+          check      (fn [exp accept]
+                       (is (= (string-as-locale exp)
+                              (neg (mk-request accept)))))]
+      (testing "works for valid headers"
+        (check "de" "de")
+        (check "de" "de_DE, de;q=0.9, en;q=0.8")
+        (check "oc" "it, fr"))
+      (testing "falls back to message-locale for empty/invalid headers"
+        (map #(check "oc" %) ["" nil "en;q=garbage" ",,," ",;," "xyz" "de-US"])
+        (is (= (message-locale) (neg {:headers {}})))
+        (is (= (message-locale) (neg {}))))
+      (testing "conveys the locale"
+        (is (= (string-as-locale "de")
+               ((locale-negotiator (fn [request] @(future (user-locale))))
+                (mk-request "de"))))))))

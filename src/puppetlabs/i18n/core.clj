@@ -1,7 +1,8 @@
 (ns puppetlabs.i18n.core
   (:gen-class)
   (:require [clojure.java.io :as io]
-            [clojure.set]))
+            [clojure.set]
+            [clojure.string :as str]))
 
 ;;; General setup/info
 (defn info-files
@@ -155,3 +156,72 @@
   "Translate a message into the system locale, interpolating as needed"
   [& args]
   `(translate ~(namespace-munge *ns*) (system-locale) ~@args))
+
+;;
+;; Ring middleware for language negotiation
+;;
+
+(defn as-number
+  "Parse a string into a float. If the string is not a valid number,
+  return 0"
+  [s]
+  (cond
+    (nil? s) 0
+    (number? s) s
+    (string? s)
+    (try
+      (Double/parseDouble s)
+      (catch NumberFormatException _ 0))
+    :else 0))
+
+(defn parse-http-accept-header
+  "Parses HTTP Accept header and returns sequence of [choice weight] pairs
+  sorted by weight."
+  [header]
+  (sort-by second #(compare %2 %1)
+           (remove
+            ;; q values can only have three decimal places; we need to
+            ;; remove all q values that are 0
+            (fn [[lang q]] (< q 0.0001))
+            (for [choice (remove str/blank? (str/split (str header) #","))]
+              (let [[lang q] (str/split choice #";")]
+                [(str/trim lang)
+                 (or (when q (as-number (get (str/split q #"=") 1)))
+                     1)])))))
+
+(defn negotiate-locale
+  "Given a string sequence of wanted locale (sorted by preference) and a
+  set of available locales, all expressed as strings, find the first string
+  in wanted that is available, and return the corresponding Locale object.
+
+  This function will always return a locale. If we can't negotiate a
+  suitable locale, we fall back to the message-locale"
+  [wanted available]
+  ;; @todo lutter 2015-05-20: if wanted contains only a country-specific
+  ;; variant, and we have the general variant, we might want to match those
+  ;; up if we don't find a better match. This is not what the HTTP spec
+  ;; says, but helps work around broken browsers.
+  ;;
+  ;; For example, if we have locales #{"de" "es"} available, and the user
+  ;; asks for ["de_AT" "fr"], we should probably return "de" rather than
+  ;; falling back to the message locale
+  (if-let [loc (some available wanted)]
+    (try
+      (string-as-locale loc)
+      (finally (message-locale)))
+    (message-locale)))
+
+(defn locale-negotiator
+  "Ring middleware that performs locale negotiation.
+
+  It parses the Accept-Language header and selects the best available
+  locale according to the user's preference. That locale is set as the user
+  locale while evaluating handler."
+  [handler]
+  (fn [request]
+    (let [headers (:headers request)]
+    (with-user-locale
+      (negotiate-locale
+       (mapv first (parse-http-accept-header (get headers "accept-language")))
+       (available-locales))
+      (handler request)))))
