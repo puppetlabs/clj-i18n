@@ -217,9 +217,11 @@
   locale while evaluating handler."
   [handler]
   (fn [request]
-    (let [headers (:headers request)]
-    (with-user-locale
-      (negotiate-locale
-       (mapv first (parse-http-accept-header (get headers "accept-language")))
-       (available-locales))
-      (handler request)))))
+    ;; @todo lutter 2015-06-03: remove our hand-crafted language
+    ;; negotiation and use java.util.Locale/filterTags instead; this would
+    ;; remove the gnarly parse-http-accept-header business. Requires Java 8
+    (let [headers (:headers request)
+          parsed  (parse-http-accept-header (get headers "accept-language"))
+          wanted  (mapv first parsed)
+          negotiated (negotiate-locale wanted (available-locales))]
+      (with-user-locale negotiated (handler request)))))
