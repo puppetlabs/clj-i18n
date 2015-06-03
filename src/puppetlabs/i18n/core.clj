@@ -206,9 +206,7 @@
   ;; asks for ["de_AT" "fr"], we should probably return "de" rather than
   ;; falling back to the message locale
   (if-let [loc (some available wanted)]
-    (try
-      (string-as-locale loc)
-      (finally (message-locale)))
+    (string-as-locale loc)
     (message-locale)))
 
 (defn locale-negotiator
