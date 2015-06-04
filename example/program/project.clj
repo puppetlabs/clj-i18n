@@ -6,5 +6,5 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [puppetlabs/i18n "0.1.0-SNAPSHOT"]]
   :plugins      [[puppetlabs/i18n "0.1.0-SNAPSHOT"]]
-  :main puppetlabs.i18n.example.program.main
-  :aot [puppetlabs.i18n.example.program.main])
+  :main puppetlabs.i18n-example-program.main
+  :aot [puppetlabs.i18n-example-program.main])

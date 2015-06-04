@@ -1,4 +1,4 @@
-(ns puppetlabs.i18n.example.program.main
+(ns puppetlabs.i18n-example-program.main
   (:gen-class)
   (:require [puppetlabs.i18n.core :as i18n :refer [trs]]))
 
