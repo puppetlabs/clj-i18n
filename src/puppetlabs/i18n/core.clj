@@ -99,6 +99,11 @@
         (first (filter #(.startsWith namespace %)
                        (reverse (sort-by count (keys (info-map)))))))))
 
+(defmacro bundle-name
+  "Return the name of the ResourceBundle that the trs and tru macros will use"
+  []
+  `(bundle-for-namespace ~(namespace-munge *ns*)))
+
 (defn get-bundle
   "Get the java.util.ResourceBundle for the given locale (a string)"
   [namespace loc]
