@@ -143,7 +143,7 @@
   ([loc msg args]
    ;; we might want to cache these MessageFormat's in some way
    ;; maybe in a size-bounded LRU cache
-   (.format (new java.text.MessageFormat msg loc) args)))
+   (.format (new java.text.MessageFormat msg loc) (to-array args))))
 
 (defn translate
   "Translate a message into the given locale, interpolating as

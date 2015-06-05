@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-04 14:20-0700\n"
+"POT-Creation-Date: 2015-06-05 12:45-0700\n"
 "PO-Revision-Date: 2015-06-04 07:40-0700\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,14 +17,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/puppetlabs/i18n_example_program/main.clj:9
-msgid "yo"
-msgstr ""
-
-#: src/puppetlabs/i18n_example_program/main.clj:10
+#: src/puppetlabs/i18n_example_program/main.clj:14
 msgid "Hello, World"
 msgstr "Hallo, draußen nur Kännchen"
 
-#: src/puppetlabs/i18n_example_program/main.clj:11
+#: src/puppetlabs/i18n_example_program/main.clj:17
 msgid "{0} bottles on the wall"
 msgstr "An der Wand sind {0} Flaschen"
+
+#: src/puppetlabs/i18n_example_program/main.clj:22
+msgid "If we take {0} bottles away, we have {1} left"
+msgstr "Wenn wir {0} Flaschen wegnehmen, haben wir noch {1} übrig"
