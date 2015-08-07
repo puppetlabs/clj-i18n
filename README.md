@@ -2,14 +2,16 @@
 
 A Clojure library and leiningen plugin to make i18n easier. Provides
 convenience functions to access the JVM's localization facilities and
-automates managing messages and resource bundles.
+automates managing messages and resource bundles. The tooling for
+translators uses [GNU gettext](http://www.gnu.org/software/gettext/), so
+that translators can work with `.po` files which are widely used and for
+which a huge amount of tooling exists.
 
-The `main.clj` in this repo contains some simple code that demonstrates how
-to use the translation functions. Before you can use it, you need to run
-`make` to generate the necessary `ResourceBundles`.
-
-Then you can do `lein run` or `LANG=de_DE lein run` to look at English and
-German output.
+The `main.clj` and `example/program` in this repo contain some simple code
+that demonstrates how to use the translation functions. Before you can use
+it, you need to run `make` to generate the necessary
+`ResourceBundles`. After that, you can use `lein run` or `LANG=de_DE lein
+run` to look at English and German output.
 
 ## Developer usage
 
@@ -59,6 +61,15 @@ The i18n tools maintain files in two directories: message catalogs in
 `locales/` and compiled translations in `resources/`. You should check the
 files in `locales/` into source control, but not the ones in `resources/`.
 
+### Web service changes
+
+If you are working on an HTTP service, you will also need to make sure that
+we properly handle the locale that the user requests via the
+`Accept-Language` header. The library contains the function
+`locale-negotiator` that you should use as a Ring middleware. It stores the
+negotiated locale in the `*locale*` binding - ultimately, that's the locale
+that the `tru` macro will use.
+
 ## Translator usage
 
 When a translator gets ready to translate messages, they need to update the
@@ -85,8 +96,3 @@ msgfmt` on your project.
 The code is set up as an ordinary leiningen project, with the one exception
 that you need to run `make` before running `lein test` or `lein run`, as
 there are messages that need to be turned into a message bundle.
-
-## Todo
-
-* add Ring middleware to do language negotiation based on the
-  Accept-Language header and set the per-thread locale accordingly
