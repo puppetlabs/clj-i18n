@@ -23,6 +23,10 @@ update-pot: locales/messages.pot
 locales/messages.pot: $(SRC_FILES)
 	@find src/ -name \*.clj \
 	    | xgettext --from-code=UTF-8 --language=lisp \
+	                --copyright-holder 'Puppet Labs <docs@puppetlabs.com>' -F \
+	                --package-name "$(PACKAGE)" \
+	                --package-version "$(PACKAGE_VERSION)" \
+	                --msgid-bugs-address "docs@puppetlabs.com" \
 					-ktrs:1 -ki18n/trs:1 \
 					-ktru:1 -ki18n/tru:1 \
 					-o locales/messages.pot -f -; \
