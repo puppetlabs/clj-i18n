@@ -4,9 +4,9 @@
 pom.xml
 pom.xml.asc
 *.jar
-*.class
+# *.class
 /.lein-*
 /.nrepl-port
 .hgignore
 .hg/
-/resources/locales.clj
+# /resources/locales.clj
