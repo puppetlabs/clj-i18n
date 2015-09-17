@@ -36,6 +36,27 @@ pattern. For example, you would write
 
     (println (trs "It takes {0} women {1} months to have a child" 3 9))
 
+It is sometimes useful to tell the translator something about the message;
+you can do that by preceding the message string in the`trs`/`tru`
+invocation with a comment; in the above example you might want to say
+
+    ;; This is really just a silly example message. It gets the following
+    ;; arguments:
+    ;; 0 : number of women (an integer)
+    ;; 1 : number of months (also an integer)
+    (println (trs "It takes {0} women {1} months to have a child" 3 9))
+
+The comment will be copied to `messages.pot` together with the actual
+message so that translators have some context on what they are working
+on. Note that such comments must be immediately preceding the string that
+is the message. WHen you write
+
+    ;; No transaltor will see this
+    (trs
+      "A message on another line")
+
+the comments do *not* get extracted into `messages.pot`.
+
 ### Project setup
 
 1. In your `project.clj`, add `puppetlabs/i18n` to the `:dependencies` and
