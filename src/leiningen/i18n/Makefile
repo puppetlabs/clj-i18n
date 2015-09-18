@@ -21,17 +21,22 @@ i18n: setup update-pot msgfmt
 update-pot: locales/messages.pot
 
 locales/messages.pot: $(SRC_FILES)
-	@find src/ -name \*.clj \
-	    | xgettext --from-code=UTF-8 --language=lisp \
-	                --copyright-holder 'Puppet Labs <docs@puppetlabs.com>' -F \
-	                --package-name "$(PACKAGE)" \
-	                --package-version "$(PACKAGE_VERSION)" \
-	                --msgid-bugs-address "docs@puppetlabs.com" \
-					-ktrs:1 -ki18n/trs:1 \
-					-ktru:1 -ki18n/tru:1 \
-					--add-comments \
-					-o locales/messages.pot -f -; \
-	sed -i -e 's/charset=CHARSET/charset=UTF-8/' locales/messages.pot
+	@tmp=$(mktemp $@.tmp.XXXX);                                              \
+	find src/ -name \*.clj                                                   \
+	    | xgettext --from-code=UTF-8 --language=lisp                         \
+	               --copyright-holder 'Puppet Labs <docs@puppetlabs.com>' -F \
+	               --package-name "$(PACKAGE)"                               \
+	               --package-version "$(PACKAGE_VERSION)"                    \
+	               --msgid-bugs-address "docs@puppetlabs.com"                \
+				   -ktrs:1 -ki18n/trs:1                                      \
+				   -ktru:1 -ki18n/tru:1                                      \
+	               --add-comments -o $tmp -f -;                              \
+	sed -i -e 's/charset=CHARSET/charset=UTF-8/' $tmp;                       \
+	if ! diff -q -I POT-Creation-Date $tmp $@ >& /dev/null; then             \
+		mv $tmp $@;                                                          \
+	else                                                                     \
+		rm $tmp;                                                             \
+	fi
 
 # Run msgfmt over all .po files to generate Java resource bundles
 msgfmt: $(BUNDLE_FILES)
