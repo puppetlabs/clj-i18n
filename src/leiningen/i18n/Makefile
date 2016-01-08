@@ -32,6 +32,7 @@ locales/messages.pot: $(SRC_FILES)
 				   -ktru:1 -ki18n/tru:1                                      \
 	               --add-comments -o $tmp -f -;                              \
 	sed -i -e 's/charset=CHARSET/charset=UTF-8/' $tmp;                       \
+	sed -i -e 's/POT-Creation-Date: [^\\]*/POT-Creation-Date: /' $tmp;       \
 	if ! diff -q -I POT-Creation-Date $tmp $@ >& /dev/null; then             \
 		mv $tmp $@;                                                          \
 	else                                                                     \
