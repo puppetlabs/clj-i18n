@@ -21,12 +21,14 @@
   Each entry in the map uses the following keys:
     :locales - set of the locale names in which translations are available
     :package - the toplevel package name (lein project name) for this library
-    :bundle  - the name of the resource bundle"
+    :bundle  - the name of the resource bundle
+    :source  - the path to the file from which we read this entry
+               (added automatically)"
   []
   ;; this will not change over the lifetime of the program and should be
   ;; memoized; there are a few thunks involving infos that could be
   ;; precomputed in a similar manner
-  (map #(-> % slurp read-string) (info-files)))
+  (map #(-> % slurp read-string (assoc :source %)) (info-files)))
 
 (defn info-map
   "Turn the result of infos into a map mapping the package name to locales
