@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-14 11:52-0700\n"
+"Report-Msgid-Bugs-To: docs@puppetlabs.com\n"
+"POT-Creation-Date: 2016-03-10 15:28-0800\n"
 "PO-Revision-Date: 2015-03-26 17:16-0700\n"
 "Last-Translator: David Lutterkort <lutter@watzmann.net>\n"
 "Language-Team: German\n"
@@ -17,6 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#. Very simple localization
 #: src/puppetlabs/i18n/main.clj:18
 msgid "Welcome! This is localized"
 msgstr "Willkommen ! Draußen nur Kännchen"
