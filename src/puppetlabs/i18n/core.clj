@@ -28,7 +28,29 @@
   ;; this will not change over the lifetime of the program and should be
   ;; memoized; there are a few thunks involving infos that could be
   ;; precomputed in a similar manner
-  (map #(-> % slurp read-string (assoc :source %)) (info-files)))
+  (letfn
+      [(check [item]
+         ;; Errors in locales.clj are developer errors, and should therefore
+         ;; be absolutely fatal
+         (cond
+           (nil? (:package item))
+           (throw
+            (Exception.
+             (format "Invalid locales info:%s: missing :package"
+                     (:source item))))
+           (nil? (:locales item))
+           (throw
+            (Exception.
+             (format "Invalid locales info:%s: missing :locales"
+                     (:source item))))
+           (empty? (:locales item))
+           (throw
+            (Exception.
+             (format "Invalid locales info:%s: :locales must be a nonempty set"
+                     (:source item))))
+           :else item))]
+    (map #(-> % slurp read-string (assoc :source %) check)
+         (info-files))))
 
 (defn info-map
   "Turn the result of infos into a map mapping the package name to locales
