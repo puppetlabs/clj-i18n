@@ -54,13 +54,38 @@
 
 (defn info-map
   "Turn the result of infos into a map mapping the package name to locales
-  and bundle name"
+  and bundle name.
+
+  To facilitate testing, we allow multiple infos with the same :package as
+  long as they agree on the :bundle. The result of such a setup is that
+  the :locales for such a package are the union of all the locales from
+  those info files"
   []
-  (reduce
-   (fn [map item]
-     (assoc map (:package item)
-            (select-keys item [:locales :bundle])))
-   {} (infos)))
+  (letfn [(merge-entry [old new]
+            ;; either old is nil (when this is the first entry for that package)
+            ;; or both old and new are for the same package
+            ;; Either way, new always have to have a package entry
+            {:pre [(or (nil? old)
+                       (and (some? (:package old))
+                            (= (:package old) (:package new))))
+                   (some? (:package new))]}
+            (cond
+              (and (:bundle old) (:bundle new)
+                   (not= (:bundle old) (:bundle new)))
+              (throw
+               (Exception.
+                (format "Invalid locales info: %s and %s are both for package %s but set different bundles %s and %s"
+                        (:source old) (:source new)
+                        (:package new)
+                        (:bundle old) (:bundle new))))
+              :else
+              {:locales (clojure.set/union (:locales old) (:locales new))
+               :package (:package new)
+               :bundle  (or (:bundle old) (:bundle new)) }))]
+    (reduce
+     (fn [map item]
+       (update-in map [(:package item)] merge-entry item))
+     {} (infos))))
 
 (defn available-locales
   "Return a list of all the locales for which we have translations based on

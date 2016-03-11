@@ -8,9 +8,10 @@
 (. java.util.Locale setDefault (string-as-locale "en-US"))
 
 (def de (string-as-locale "de-DE"))
-
+(def eo (string-as-locale "eo"))
 (def welcome_en "Welcome! This is localized")
 (def welcome_de "Willkommen ! Draußen nur Kännchen")
+(def welcome_eo "Welcome_pseudo_localized")
 
 (deftest handling-of-user-locale
   (testing "user-locale defaults to system-locale"
@@ -30,7 +31,11 @@
     (is (= welcome_en (tru welcome_en))))
   (testing "tru in German"
     (with-user-locale de
-      (is (= welcome_de (tru welcome_en))))))
+      (is (= welcome_de (tru welcome_en)))))
+  (testing "tru in Esperanto"
+    ;; We use Esperanto as our test locale
+    (with-user-locale eo
+      (is (= welcome_eo (tru welcome_en))))))
 
 (deftest test-trs
   (testing "trs with no user locale"
@@ -51,6 +56,11 @@
   []
   [(io/resource "test-locales/de-ru-es.clj")
    (io/resource "test-locales/fr-it.clj")])
+
+(defn merge-locale-files
+  []
+  [(io/resource "test-locales/de-ru-es.clj")
+   (io/resource "test-locales/merge-eo.clj")])
 
 (deftest test-infos
   (with-redefs
@@ -73,7 +83,12 @@
              (bundle-for-namespace "example.i18n.dog.cat")))
       (is (nil? (bundle-for-namespace "example")))
       (is (= "other.i18n.Messages"
-             (bundle-for-namespace "other.i18n.abbott.costello"))))))
+             (bundle-for-namespace "other.i18n.abbott.costello")))))
+  (with-redefs
+    [puppetlabs.i18n.core/info-files merge-locale-files]
+    (testing "merged langauges"
+      (is (= #{"de" "ru" "es" "eo"} (available-locales)))
+      (is (= 1 (count (info-map)))))))
 
 (deftest test-as-number
   (testing "convert number strings properly"

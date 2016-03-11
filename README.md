@@ -91,6 +91,42 @@ we properly handle the locale that the user requests via the
 negotiated locale in the `*locale*` binding - ultimately, that's the locale
 that the `tru` macro will use.
 
+### Testing and pseudo-localization
+
+For testing, it is often useful to introduce translations that are
+maintained separately from the generally used locales, and whose change is
+controlled by developers rather than translators. The `i18n` library uses
+the file `resources/locales.clj`, which is generated and maintained by the
+`make` targets, to track for which locales translations are
+available. Additional locales can be made available by putting one or more
+`locales.clj` files on the class path whose `:package` entry is the same as
+the one in `resources/locales.clj` but that mentions additional
+`:locales`.
+
+That makes it possible to introduce additional locales for testing by doing
+the following:
+
+1. Create a file `test/locales.clj` by copying `resources/locales.clj` and
+   edit the copy by changing the `:locales` entry to the languages that
+   should be used for testing
+1. For each of the additional locales, create a message catalog. It will
+   generally be easiest to base that message catalog on properties files
+   rather than on `.po` files. If you added the `eo` locale, you need to
+   create a file `test/<package path>/Messages_eo.properties`
+1. Use those additional locales in your tests. The `test/` directory of
+   this library has an example of that in the `test-tru` test in
+   `core_test.clj`.
+
+The macro `with-user-locale` can be used to change the locale under which a
+certain test should run, for example, with
+
+```clojure
+(let [eo (string-as-locale "eo")]
+  (with-user-locale eo
+    (testing "user-locale is Esperanto"
+      (is (= eo (user-locale))))))
+```
+
 ## Translator usage
 
 When a translator gets ready to translate messages, they need to update the
