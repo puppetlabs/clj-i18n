@@ -15,6 +15,14 @@ run` to look at English and German output.
 
 ## Developer usage
 
+The i18n library is dependent on [GNU gettext](https://www.gnu.org/software/gettext/) and will need to be installed.  This will give you xgettext and msgfmt, items needed for development.
+
+If using brew for mac:
+`brew install gettext`
+
+Occasionally gettext will not be symlinked. This can be remedied by doing the following:
+`brew link --force`
+
 Any Clojure code that needs to generate human-readable text must use the
 functions `puppetlabs.i18n.core/trs` and `puppetlabs.i18n.core/tru` to do
 so. Use `trs` for messages that should be formatted in the system's locale,
@@ -57,7 +65,24 @@ is the message. WHen you write
 
 the comments do *not* get extracted into `messages.pot`.
 
+Single quotes are addressed in the MessageFormat documentation.
+They need to be escaped with an additional single quote:
+
+    ;; This is fine
+    (trs "He's going to the store")
+
+When an apostrophe with an interpolation:
+
+    ;; You may want to supply a comment around this escaped '' to devs and translators,
+    ;; as these will need to be preserved.
+    ;; Note the single apostrophe in this statement is escaped with a second apostrophe.
+    (trs "He''s going to {0}" store-name)
+
+    ;; This will render as "Hes going to..."
+    (trs "He's going to {0}" store-name)
+
 ### Project setup
+This assumes you have gettext installed.
 
 1. In your `project.clj`, add `puppetlabs/i18n` to the `:dependencies` and
    to the `plugins`
