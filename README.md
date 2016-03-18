@@ -36,6 +36,7 @@ pattern. For example, you would write
 
     (println (trs "It takes {0} women {1} months to have a child" 3 9))
 
+### Comments for translators
 It is sometimes useful to tell the translator something about the message;
 you can do that by preceding the message string in the`trs`/`tru`
 invocation with a comment; in the above example you might want to say
@@ -49,13 +50,40 @@ invocation with a comment; in the above example you might want to say
 The comment will be copied to `messages.pot` together with the actual
 message so that translators have some context on what they are working
 on. Note that such comments must be immediately preceding the string that
-is the message. WHen you write
+is the message. When you write
 
-    ;; No transaltor will see this
+    ;; No translator will see this
     (trs
       "A message on another line")
 
 the comments do *not* get extracted into `messages.pot`.
+
+### Single quotes in messages
+
+Single quotes have a special meaning in
+[`java.text.MessageFormat`](https://docs.oracle.com/javase/8/docs/api/java/text/MessageFormat.html)
+patterns and need to be escaped with another single quote:
+
+    ;; Will produce "Hes going to the store"
+    (trs "He's going to the store")
+
+    ;; You may want to supply a comment for devs and
+    ;; translators to make sure the quoting is preserved.
+    ;; The following will produce "He's going to the store"
+    ;; (trs "He''s going to the store")
+
+### Development tools
+
+Extracting messages and building ResourceBundles requires the command line
+tools from [GNU gettext](https://www.gnu.org/software/gettext/) which you
+will have to install manually.
+
+If you are using brew on OSX, run `brew install gettext`. Occasionally
+gettext will not be symlinked. This can be remedied by running `brew link
+--force`
+
+On Red Hat-based operating systems, including Fedora, install gettext via
+`yum install gettext`
 
 ### Project setup
 
