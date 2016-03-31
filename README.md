@@ -181,3 +181,8 @@ msgfmt` on your project.
 The code is set up as an ordinary leiningen project, with the one exception
 that you need to run `make` before running `lein test` or `lein run`, as
 there are messages that need to be turned into a message bundle.
+
+# Maintaineance
+
+Maintainers: David Lutterkort <lutter@puppetlabs.com> and Libby Molina <libby@puppetlabs.com>
+Tickets: still need to determine the right place to file bugs
