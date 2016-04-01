@@ -37,6 +37,7 @@ pattern. For example, you would write
     (println (trs "It takes {0} women {1} months to have a child" 3 9))
 
 ### Comments for translators
+
 It is sometimes useful to tell the translator something about the message;
 you can do that by preceding the message string in the`trs`/`tru`
 invocation with a comment; in the above example you might want to say
@@ -64,51 +65,62 @@ Single quotes have a special meaning in
 [`java.text.MessageFormat`](https://docs.oracle.com/javase/8/docs/api/java/text/MessageFormat.html)
 patterns and need to be escaped with another single quote:
 
-    ;; Will produce "Hes going to the store"
+    ;; The following will produce "Hes going to the store"
     (trs "He's going to the store")
 
     ;; You may want to supply a comment for devs and
     ;; translators to make sure the quoting is preserved.
     ;; The following will produce "He's going to the store"
-    ;; (trs "He''s going to the store")
+    (trs "He''s going to the store")
 
 ### Development tools
 
-Extracting messages and building ResourceBundles requires the command line
-tools from [GNU gettext](https://www.gnu.org/software/gettext/) which you
-will have to install manually.
+Extracting messages and building ResourceBundles requires the command line tools
+from [GNU gettext](https://www.gnu.org/software/gettext/) which you will have to
+install manually.
 
-If you are using brew on OSX, run `brew install gettext`. Occasionally
-gettext will not be symlinked. This can be remedied by running `brew link
---force`
+If you are using brew on OSX, run `brew install gettext`. Occasionally gettext
+will not be symlinked. This can be remedied by running `brew link --force`
 
 On Red Hat-based operating systems, including Fedora, install gettext via
 `yum install gettext`
 
 ### Project setup
 
-1. In your `project.clj`, add `puppetlabs/i18n` to the `:dependencies` and
-   to the `plugins`
-1. Run `lein i18n init`. This will
-   * put a `Makefile.i18n` into `dev-resources/` in your project and
-     include it into an existing toplevel `Makefile` resp. create a new one
-     that does that. You should check these files into you source control
-     system.
-   * add hooks to the `compile` task that will refresh i18n
-     data (equivalent of running `make i18n`)
+[![Clojars Project](https://img.shields.io/clojars/v/puppetlabs/i18n.svg)](https://clojars.org/puppetlabs/i18n)
 
-This setup will ensure that the file `locales/messages.pot` and the
-translations in `locales/LANG.po` are updated every time you compile your
-project. Compiling your project will also regenerate the Java
-`ResourceBundle` classes that your code needs to do translations.
+1. In your `project.clj`, add `puppetlabs/i18n` to the `:dependencies` and to
+   the `plugins`
+1. Run `lein i18n init`. This will
+   * put a `Makefile.i18n` into `dev-resources/` in your project and include it
+     into an existing toplevel `Makefile` resp. create a new one that does that.
+     You should check these files into you source control system.
+   * add hooks to the `compile` task that will refresh i18n data (equivalent of
+     running `make i18n`)
+
+This setup will ensure that the file `locales/messages.pot` and the translations
+in `locales/LANG.po` are updated every time you compile your project. Compiling
+your project will also regenerate the Java `ResourceBundle` classes that your
+code needs to do translations.
 
 You can manually regenerate these files by running `make i18n`. Additional
-information about the Make targets is available through running `make
-help`.
+information about the Make targets is available through running `make help`.
 
-The i18n tools maintain files in two directories: message catalogs in
-`locales/` and compiled translations in `resources/`. You should check the
-files in `locales/` into source control, but not the ones in `resources/`.
+The i18n tools maintain files in three directories:
+  * message catalogs in `locales/` 
+  * compiled translations in `resources/`
+  * temporary files in the project root `/`, for example `/mp-e`
+
+You should check the files in `locales/` into source control, but not the ones
+ in `resources/` or the `mp-*` files. A sample `.gitignore` for a project might
+ look something like:
+ 
+ ```
+ # Ignore these files for clj-i18n
+ /resources/example/*.class
+ /resources/locales.clj
+ /mp-*
+ ```
 
 ### Web service changes
 
