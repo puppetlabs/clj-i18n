@@ -13,7 +13,7 @@ PACKAGE=puppetlabs.i18n
 LOCALES=$(basename $(notdir $(wildcard locales/*.po)))
 PACKAGE_DIR=$(subst .,/,$(PACKAGE))
 BUNDLE_FILES=$(patsubst %,resources/$(PACKAGE_DIR)/Messages_%.class,$(LOCALES) $(MESSAGE_LOCALE))
-SRC_FILES=$(shell find src/ -name \*.clj)
+SRC_FILES=$(shell find src -name \*.clj)
 
 i18n: setup update-pot msgfmt
 
@@ -22,7 +22,7 @@ update-pot: locales/messages.pot
 
 locales/messages.pot: $(SRC_FILES)
 	@tmp=$(mktemp $@.tmp.XXXX);                                              \
-	find src/ -name \*.clj                                                   \
+	find src -name \*.clj                                                    \
 	    | xgettext --from-code=UTF-8 --language=lisp                         \
 	               --copyright-holder 'Puppet Labs <docs@puppetlabs.com>' -F \
 	               --package-name "$(PACKAGE)"                               \
