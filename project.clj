@@ -5,7 +5,8 @@
             :url "http://www.apache.org/licenses/LICENSE-2.0"}
 
   :pedantic? :abort
-  :dependencies [[org.clojure/clojure "1.6.0"]]
+  :dependencies [[org.clojure/clojure "1.6.0"]
+                 [org.gnu.gettext/libintl "0.18.3"]]
 
   :main puppetlabs.i18n.main
   :aot [puppetlabs.i18n.main]

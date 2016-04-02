@@ -13,6 +13,15 @@
 (def welcome_de "Willkommen ! Draußen nur Kännchen")
 (def welcome_eo "Welcome_pseudo_localized")
 
+(def one_bottle "There is one bottle of beer on the wall.")
+(def n_bottles "There are {0} bottles of beer on the wall.")
+(def one_bottle_en "There is one bottle of beer on the wall.")
+(def one_bottle_de "Es gibt eine Flasche Bier an der Wand.")
+
+(def six_bottle_en "There are 6 bottles of beer on the wall.")
+(def six_bottle_de "Es gibt 6 Flaschen Bier an der Wand.")
+
+
 (deftest handling-of-user-locale
   (testing "user-locale defaults to system-locale"
     (is (= (system-locale) (user-locale))))
@@ -37,12 +46,30 @@
     (with-user-locale eo
       (is (= welcome_eo (tru welcome_en))))))
 
+(deftest test-trun
+  (testing "trun with no user locale"
+    (is (= one_bottle_en (trun one_bottle n_bottles 1)))
+    (is (= six_bottle_en (trun one_bottle n_bottles 6))))
+  (testing "trun in German"
+    (with-user-locale de (is (= one_bottle_de (trun one_bottle n_bottles 1))))
+    (with-user-locale de (is (= six_bottle_de (trun one_bottle n_bottles 6))))))
+
+
 (deftest test-trs
   (testing "trs with no user locale"
     (is (= welcome_en (trs welcome_en))))
   (testing "trs with a user locale"
     (with-user-locale de
       (is (= welcome_en (trs welcome_en))))))
+
+
+(deftest test-trsn
+  (testing "trun with no user locale"
+    (is (= one_bottle_en (trsn one_bottle n_bottles 1)))
+    (is (= six_bottle_en (trsn one_bottle n_bottles 6))))
+  (testing "trun with a user locale"
+    (with-user-locale de (is (= one_bottle_en (trsn one_bottle n_bottles 1))))
+    (with-user-locale de (is (= six_bottle_en (trsn one_bottle n_bottles 6))))))
 
 ;;
 ;; Helper files in dev-resources; they have the same format as the

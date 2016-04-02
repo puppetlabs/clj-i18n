@@ -22,19 +22,27 @@ for example log messages, and `tru` for messages that will be shown to the
 current user, for example an error that happened processing a web request.
 
 When you require `puppetlabs.i18n.core` into your namespace, you *must*
-call it either `trs`/`tru` or `i18n/trs`/`i18n/tru` (these are the names
-that `xgettext` will look for when it extracts strings) Typically, you
+call it either `trs`/`tru`/`trun`/`trsn` or
+`i18n/trs`/`i18n/tru`/`i18n/trun`/`i18n/trsn` (these are the names that
+`xgettext` will look for when it extracts strings) Typically, you
 would have this in your namespace declaration
 
     (ns puppetlabs.myproject
-      (:require [puppetlabs.i18n.core :as i18n :refer [trs tru]]))
+      (:require [puppetlabs.i18n.core :as i18n :refer [trs trsn tru trun]]))
 
 You use `trs`/`tru` very similar to how you use `format`, except that the
 format string must be a valid
 [`java.text.MessageFormat`](https://docs.oracle.com/javase/8/docs/api/java/text/MessageFormat.html)
 pattern. For example, you would write
 
-    (println (trs "It takes {0} women {1} months to have a child" 3 9))
+    (println (trs "It takes {0} software engineers {1} hours to change a light bulb" 3 9))
+
+`trsn`/`trun` are similar to `trs`/`tru` except that they support pluralization
+of strings.  The first argument is the singular version of the string, the second
+argument must be the plural form of the string.  The third argument is the count value
+to determine the level of pluralization.  Any additional arguments will be used for additional formatting
+
+    (println (trsn "We found one cute puppy" "We found {0} cute puppies" 5))
 
 ### Comments for translators
 
@@ -152,7 +160,8 @@ the following:
 1. For each of the additional locales, create a message catalog. It will
    generally be easiest to base that message catalog on properties files
    rather than on `.po` files. If you added the `eo` locale, you need to
-   create a file `test/<package path>/Messages_eo.properties`
+   create a file `test/<package path>/Messages_eo.properties`.  Note that
+   pluralization is not currently supported in properties files.
 1. Use those additional locales in your tests. The `test/` directory of
    this library has an example of that in the `test-tru` test in
    `core_test.clj`.
