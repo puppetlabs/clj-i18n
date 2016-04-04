@@ -79,8 +79,10 @@ Extracting messages and building ResourceBundles requires the command line tools
 from [GNU gettext](https://www.gnu.org/software/gettext/) which you will have to
 install manually.
 
-If you are using brew on OSX, run `brew install gettext`. Occasionally gettext
-will not be symlinked. This can be remedied by running `brew link --force`
+If you are using Homebrew on OSX, run `brew install gettext`. OSX provides the
+BSD gettext library by default and because of that the Homebrew formula for
+`gettext` is keg-only. keg-only formulas are not symlinked. This can be remedied
+by running `brew link gettext --force`.
 
 On Red Hat-based operating systems, including Fedora, install gettext via
 `yum install gettext`
@@ -107,14 +109,14 @@ You can manually regenerate these files by running `make i18n`. Additional
 information about the Make targets is available through running `make help`.
 
 The i18n tools maintain files in three directories:
-  * message catalogs in `locales/` 
+  * message catalogs in `locales/`
   * compiled translations in `resources/`
   * temporary files in the project root `/`, for example `/mp-e`
 
 You should check the files in `locales/` into source control, but not the ones
  in `resources/` or the `mp-*` files. A sample `.gitignore` for a project might
  look something like:
- 
+
  ```
  # Ignore these files for clj-i18n
  /resources/example/*.class
