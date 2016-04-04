@@ -28,10 +28,10 @@ locales/messages.pot: $(SRC_FILES)
 	               --package-name "$(PACKAGE)"                               \
 	               --package-version "$(PACKAGE_VERSION)"                    \
 	               --msgid-bugs-address "docs@puppetlabs.com"                \
-				   -ktrs:1 -ki18n/trs:1                                      \
-				   -ktru:1 -ki18n/tru:1                                      \
-				   -ktrun:1,2 -ki18n/trun:1,2                                \
-				   -ktrsn:1,2 -ki18n/trsn:1,2                                \
+	               -ktrs:1 -ki18n/trs:1                                      \
+	               -ktru:1 -ki18n/tru:1                                      \
+	               -ktrun:1,2 -ki18n/trun:1,2                                \
+	               -ktrsn:1,2 -ki18n/trsn:1,2                                \
 	               --add-comments -o $tmp -f -;                              \
 	sed -i -e 's/charset=CHARSET/charset=UTF-8/' $tmp;                       \
 	sed -i -e 's/POT-Creation-Date: [^\\]*/POT-Creation-Date: /' $tmp;       \
