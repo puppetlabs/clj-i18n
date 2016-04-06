@@ -1,7 +1,7 @@
 (ns puppetlabs.i18n.main
   "Some I18N examples"
   (:gen-class)
-  (:require [puppetlabs.i18n.core :as i18n :refer [tru trs]]))
+  (:require [puppetlabs.i18n.core :as i18n :refer [tru trs trsn]]))
 
 ;; Some simple examples of using tru/trs
 ;; The unit tests rely on the message catalog and translation generated for
@@ -17,10 +17,17 @@
   ;; Very simple localization
   (println (trs "Welcome! This is localized"))
 
+  ;; Very simple plural system localization
+  (doseq [beers (range 5 0 -1)]
+    (println (trsn "There is one bottle of beer on the wall."
+                   "There are {0} bottles of beer on the wall."
+                   beers)))
+
   ;; String with arguments
-  (let [nprog 3 nmonths 5]
+  (let [nprog 3
+        nmonths 5]
     (println (i18n/tru "It took {0} programmers {1} months to implement this"
-                      nprog nmonths)))
+                       nprog nmonths)))
 
   ;; String with special formatting
   (let [nbikes 9000000]

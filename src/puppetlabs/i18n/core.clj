@@ -159,7 +159,7 @@
   (try
     (let [base-name (bundle-for-namespace namespace)]
       (and base-name
-           (java.util.ResourceBundle/getBundle base-name loc)))
+           (gnu.gettext.GettextResource/getBundle base-name loc)))
     (catch java.lang.NullPointerException e
       ;; base-name or loc were nil
       nil)
@@ -176,11 +176,26 @@
   (let [bundle (get-bundle namespace loc)]
     (if bundle
       (try
-        (.getString bundle msg)
+        (gnu.gettext.GettextResource/gettext bundle msg)
         (catch java.util.MissingResourceException e
           ;; no key for msg
           msg))
       msg)))
+
+(defn lookup-plural
+  "Look msg up in the resource bundle for namespace in the locale loc. If
+  there is no resource bundle for it, or the resource bundle does not
+  contain an entry for msg, return msg itself"
+  [namespace loc msgid msgid-plural count]
+  (let [bundle (get-bundle namespace loc)]
+    (if bundle
+      (try
+        (gnu.gettext.GettextResource/ngettext bundle msgid msgid-plural count)
+        (catch java.util.MissingResourceException e
+          ;; no key for msg
+          msgid))
+      msgid)))
+
 
 (defn fmt
   "Use msg as a java.text.MessageFormat and interpolate the args
@@ -201,15 +216,32 @@
   [namespace loc msg & args]
   (fmt loc (lookup namespace loc msg) (to-array args)))
 
+(defn translate-plural
+  "Translate a message into the given locale, interpolating as
+  needed. The count argument can be interpolated as {0}.  Messages are looked
+  up in the resource bundle associated with the given namespace"
+  [namespace loc msgid msgid-plural count & args]
+  (fmt loc (lookup-plural namespace loc msgid msgid-plural count) (to-array (cons count args))))
+
 (defmacro tru
   "Translate a message into the user's locale, interpolating as needed"
   [& args]
   `(translate ~(namespace-munge *ns*) (user-locale) ~@args))
 
+(defmacro trun
+  "Translate a message into the user's locale observing pluralization, interpolating as needed"
+  [& args]
+  `(translate-plural ~(namespace-munge *ns*) (user-locale) ~@args))
+
 (defmacro trs
   "Translate a message into the system locale, interpolating as needed"
   [& args]
   `(translate ~(namespace-munge *ns*) (system-locale) ~@args))
+
+(defmacro trsn
+  "Translate a message into the system locale observing pluralization, interpolating as needed"
+  [& args]
+  `(translate-plural ~(namespace-munge *ns*) (system-locale) ~@args))
 
 ;;
 ;; Ring middleware for language negotiation
