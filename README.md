@@ -208,4 +208,4 @@ there are messages that need to be turned into a message bundle.
 # Maintaineance
 
 Maintainers: David Lutterkort <lutter@puppetlabs.com> and Libby Molina <libby@puppetlabs.com>
-Tickets: still need to determine the right place to file bugs
+Tickets: File bug tickets at https://tickets.puppetlabs.com/browse/INTL, and add the `clj` component to the ticket.
