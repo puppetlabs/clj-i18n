@@ -19,37 +19,46 @@
   array of maps. There is one locales.clj file per Clojure project.
 
   Each entry in the map uses the following keys:
-    :locales - set of the locale names in which translations are available
-    :package - the toplevel package name (lein project name) for this library
-    :bundle  - the name of the resource bundle
-    :source  - the path to the file from which we read this entry
-               (added automatically)"
+    :locales  - set of the locale names in which translations are available
+    :packages - the list of pacakges covered by the associted resouce bundle
+    :bundle   - the name of the resource bundle
+    :source   - the path to the file from which we read this entry
+                (added automatically)"
   []
   ;; this will not change over the lifetime of the program and should be
   ;; memoized; there are a few thunks involving infos that could be
   ;; precomputed in a similar manner
   (letfn
-      [(check [item]
-         ;; Errors in locales.clj are developer errors, and should therefore
-         ;; be absolutely fatal
-         (cond
-           (nil? (:package item))
+    [(check-locales [item]
+       (if-let [locales (:locales item)]
+         (if (and (set? locales) (seq locales))
+           item
            (throw
-            (Exception.
-             (format "Invalid locales info:%s: missing :package"
-                     (:source item))))
-           (nil? (:locales item))
+             (Exception.
+               (format "Invalid locales info: %s: :locales must be a nonempty set"
+                       (:source item)))))
+         (throw
+           (Exception.
+             (format "Invalid locales info: %s: missing :locales"
+                     (:source item))))))
+     (check-and-normalize-packages [item]
+       (if-let [packages (:packages item)]
+         (if (coll? packages)
+           (-> item
+               (dissoc :package))                           ; just to make sure we don't have both: :packages & :package
            (throw
-            (Exception.
-             (format "Invalid locales info:%s: missing :locales"
-                     (:source item))))
-           (empty? (:locales item))
+             (Exception.
+               (format "Invalid locales info: %s: :packages must be a collection"
+                       (:source item)))))
+         (if-let [package (:package item)]                  ; for backwards compatibility: transform :package to :packages
+           (-> item
+               (dissoc :package)
+               (assoc :packages [package]))
            (throw
-            (Exception.
-             (format "Invalid locales info:%s: :locales must be a nonempty set"
-                     (:source item))))
-           :else item))]
-    (map #(-> % slurp read-string (assoc :source %) check)
+             (Exception.
+               (format "Invalid locales info: %s: missing :packages"
+                       (:source item)))))))]
+    (map #(-> % slurp read-string (assoc :source %) check-locales check-and-normalize-packages)
          (info-files))))
 
 (defn info-map
@@ -61,31 +70,34 @@
   the :locales for such a package are the union of all the locales from
   those info files"
   []
-  (letfn [(merge-entry [old new]
-            ;; either old is nil (when this is the first entry for that package)
-            ;; or both old and new are for the same package
-            ;; Either way, new always have to have a package entry
-            {:pre [(or (nil? old)
-                       (and (some? (:package old))
-                            (= (:package old) (:package new))))
-                   (some? (:package new))]}
-            (cond
-              (and (:bundle old) (:bundle new)
-                   (not= (:bundle old) (:bundle new)))
-              (throw
-               (Exception.
-                (format "Invalid locales info: %s and %s are both for package %s but set different bundles %s and %s"
-                        (:source old) (:source new)
-                        (:package new)
-                        (:bundle old) (:bundle new))))
-              :else
-              {:locales (clojure.set/union (:locales old) (:locales new))
-               :package (:package new)
-               :bundle  (or (:bundle old) (:bundle new)) }))]
+  (letfn [(merge-entry [old new package]
+            (if (some? old)
+              (let [bundle-old (:bundle old)
+                    bundle-new (:bundle new)]
+                (if (or (nil? bundle-old) (nil? bundle-new) (= bundle-old bundle-new))
+                  {:locales (clojure.set/union (:locales old) (:locales new))
+                   :bundle  (or bundle-old bundle-new)
+                   :source  (let [source-old (:source old)
+                                  source-new (:source new)]
+                              (clojure.set/union
+                                (if (set? source-old) source-old #{source-old})
+                                (if (set? source-new) source-new #{source-new})))}
+                  (throw
+                    (Exception.
+                      (format "Invalid locales info: %s and %s are both for package %s but set different bundles %s and %s"
+                              (:source old) (:source new)
+                              package
+                              bundle-old bundle-new)))))
+              new))]
     (reduce
-     (fn [map item]
-       (update-in map [(:package item)] merge-entry item))
-     {} (infos))))
+      (fn [map item]
+        (let [packages (:packages item)
+              item (dissoc item :packages)]
+          (reduce
+            (fn [map package]
+              (update-in map [package] merge-entry item package))
+            map packages)))
+      {} (infos))))
 
 (defn available-locales
   "Return a list of all the locales for which we have translations based on
@@ -143,10 +155,11 @@
 (defn bundle-for-namespace
   "Find the name of the ResourceBundle for the given namespace name"
   [namespace]
-  (:bundle
-   (get (info-map)
-        (first (filter #(.startsWith namespace %)
-                       (reverse (sort-by count (keys (info-map)))))))))
+  (let [info-map (info-map)]
+    (:bundle
+      (get info-map
+           (first (filter #(.startsWith namespace %)
+                          (reverse (sort-by count (keys info-map)))))))))
 
 (defmacro bundle-name
   "Return the name of the ResourceBundle that the trs and tru macros will use"

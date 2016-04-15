@@ -53,10 +53,12 @@
   (let [dest (path-join (dev-resources-dir project) "Makefile.i18n")
         makefile (io/resource "leiningen/i18n/Makefile")]
     (spit (io/as-file dest)
-          (clojure.string/replace
+          (clojure.string/replace-first
            (slurp makefile)
-           #"PACKAGE=.*"
-           (str "PACKAGE=" (bundle-package-name project))))))
+           ; use RegExp's m flag - (?m) - so that ^/$ matach start/end of line rather than
+           ; start/end of the entire string
+           #"(?m)^BUNDLE=.*$"
+           (str "BUNDLE=" (bundle-package-name project))))))
 
 (defn project-file
   "Construct a path in the project's root by appending rest to it and
