@@ -193,8 +193,8 @@
         (gnu.gettext.GettextResource/ngettext bundle msgid msgid-plural count)
         (catch java.util.MissingResourceException e
           ;; no key for msg
-          msgid))
-      msgid)))
+          (if (= count 1) msgid msgid-plural)))
+      (if (= count 1) msgid msgid-plural))))
 
 
 (defn fmt
