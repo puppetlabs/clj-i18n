@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: docs@puppetlabs.com\n"
+"Report-Msgid-Bugs-To: docs@puppet.com\n"
 "POT-Creation-Date: \n"
 "PO-Revision-Date: 2015-03-26 17:16-0700\n"
 "Last-Translator: David Lutterkort <lutter@watzmann.net>\n"
@@ -28,10 +28,10 @@ msgid_plural "There are {0} bottles of beer on the wall."
 msgstr[0] "Es gibt eine Flasche Bier an der Wand."
 msgstr[1] "Es gibt {0} Flaschen Bier an der Wand."
 
-#: src/puppetlabs/i18n/main.clj:27
+#: src/puppetlabs/i18n/main.clj:29
 msgid "It took {0} programmers {1} months to implement this"
 msgstr "{0} Programmierer brauchten {1} Monat(e) um das zu implementieren"
 
-#: src/puppetlabs/i18n/main.clj:32
+#: src/puppetlabs/i18n/main.clj:34
 msgid "There are {0,number,integer} bicycles in Beijing"
 msgstr "In Peking gibt es {0,number,integer} Fahrräder"
