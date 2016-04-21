@@ -101,12 +101,16 @@ On Red Hat-based operating systems, including Fedora, install gettext via
 
 1. In your `project.clj`, add `puppetlabs/i18n` to the `:dependencies` and to
    the `plugins`
-1. Run `lein i18n init`. This will
+2. Run `lein i18n init`. This will
    * put a `Makefile.i18n` into `dev-resources/` in your project and include it
      into an existing toplevel `Makefile` resp. create a new one that does that.
      You should check these files into you source control system.
    * add hooks to the `compile` task that will refresh i18n data (equivalent of
      running `make i18n`)
+3. If there are namespaces/packages in your project with names which do not
+   start with a prefix derived from the project name, you'll need to list all
+   of your namespaces/package name prefixes in the `PACKAGES` variable in the
+   toplevel `Makefile` before the inclusion of the `dev-resources/Makefile.i18n`
 
 This setup will ensure that the file `locales/messages.pot` and the translations
 in `locales/LANG.po` are updated every time you compile your project. Compiling

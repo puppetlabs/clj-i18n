@@ -1,5 +1,6 @@
-;; This is a sample of the locales.clj file that the Makefile generates
-;; It is used by the tests in core_test.clj
+;; This is a sample of the locales.clj file that the old version of
+;; the Makefile used to generate.
+;; It is used by the tests in core_test.clj.
 {
   :locales #{"de" "es" "ru"}
   :package "example.i18n"
