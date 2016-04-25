@@ -29,10 +29,10 @@ msgid_plural "There are {0} bottles of beer on the wall."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/puppetlabs/i18n/main.clj:27
+#: src/puppetlabs/i18n/main.clj:29
 msgid "It took {0} programmers {1} months to implement this"
 msgstr ""
 
-#: src/puppetlabs/i18n/main.clj:32
+#: src/puppetlabs/i18n/main.clj:34
 msgid "There are {0,number,integer} bicycles in Beijing"
 msgstr ""

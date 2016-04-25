@@ -8,6 +8,9 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.gnu.gettext/libintl "0.18.3"]]
 
+  :profiles {:dev {:dependencies [[me.raynes/fs "1.4.6"]]}}
+  :aliases {"test" ["do" ["run" "-m" "puppetlabs.i18n.make"] ["test"]]}
+
   :main puppetlabs.i18n.main
   :aot [puppetlabs.i18n.main]
 

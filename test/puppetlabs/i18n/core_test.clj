@@ -1,8 +1,24 @@
 (ns puppetlabs.i18n.core-test
   (:require [clojure.test :refer :all]
             [puppetlabs.i18n.core :refer :all]
+            [puppetlabs.i18n.make :refer [i18n-make]]
             [clojure.java.io :as io]
-            [clojure.pprint :refer [pprint]]))
+            [clojure.pprint :refer [pprint]]
+            [me.raynes.fs :as fs]))
+
+(defn make-fixture
+  "Runs the i18n-make call as a fixture"
+  [f]
+  (let [target-dir (fs/temp-dir "target")
+        compile-dir (fs/temp-dir "compile")]
+    (.deleteOnExit target-dir)
+    (.deleteOnExit compile-dir)
+
+    (i18n-make "i18n" "puppetlabs" (.getAbsolutePath target-dir) (.getAbsolutePath compile-dir))
+
+    (f)))
+
+(use-fixtures :once make-fixture)
 
 ;; Set the JVM's default locale so we run in a known environment
 (. java.util.Locale setDefault (string-as-locale "en-US"))
