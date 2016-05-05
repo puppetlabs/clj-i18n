@@ -36,25 +36,28 @@ i18n: update-pot msgfmt
 update-pot: locales/messages.pot
 
 locales/messages.pot: $(shell $(FIND_SOURCES)) | locales
-	@tmp=$(mktemp $@.tmp.XXXX);                                        \
-	$(FIND_SOURCES)                                                    \
-	    | xgettext --from-code=UTF-8 --language=lisp                   \
-	               --copyright-holder 'Puppet <docs@puppet.com>' -F    \
-	               --package-name "$(BUNDLE)"                          \
-	               --package-version "$(BUNDLE_VERSION)"               \
-	               --msgid-bugs-address "docs@puppet.com"              \
-	               -ktrs:1 -ki18n/trs:1                                \
-	               -ktru:1 -ki18n/tru:1                                \
-	               -kmark:1 -ki18n/mark:1                              \
-	               -ktrun:1,2 -ki18n/trun:1,2                          \
-	               -ktrsn:1,2 -ki18n/trsn:1,2                          \
-	               --add-comments -o $tmp -f -;                        \
-	sed -i -e 's/charset=CHARSET/charset=UTF-8/' $tmp;                 \
-	sed -i -e 's/POT-Creation-Date: [^\\]*/POT-Creation-Date: /' $tmp; \
-	if ! diff -q -I POT-Creation-Date $tmp $@ >& /dev/null; then       \
-	    mv $tmp $@;                                                    \
-	else                                                               \
-	    rm $tmp;                                                       \
+	@tmp=$$(mktemp $@.tmp.XXXX);                                            \
+	$(FIND_SOURCES)                                                         \
+	    | xgettext --from-code=UTF-8 --language=lisp                        \
+	               --copyright-holder='Puppet <docs@puppet.com>'            \
+	               --package-name="$(BUNDLE)"                               \
+	               --package-version="$(BUNDLE_VERSION)"                    \
+	               --msgid-bugs-address="docs@puppet.com"                   \
+	               -k                                                       \
+	               -kmark:1 -ki18n/mark:1                                   \
+	               -ktrs:1 -ki18n/trs:1                                     \
+	               -ktru:1 -ki18n/tru:1                                     \
+	               -ktrun:1,2 -ki18n/trun:1,2                               \
+	               -ktrsn:1,2 -ki18n/trsn:1,2                               \
+	               --add-comments --sort-by-file                            \
+	               -o $$tmp -f -;                                           \
+	sed -i.bak -e 's/charset=CHARSET/charset=UTF-8/' $$tmp;                 \
+	sed -i.bak -e 's/POT-Creation-Date: [^\\]*/POT-Creation-Date: /' $$tmp; \
+	rm -f $$tmp.bak;                                                        \
+	if ! diff -q -I POT-Creation-Date $$tmp $@ >& /dev/null; then           \
+	    mv $$tmp $@;                                                        \
+	else                                                                    \
+	    rm $$tmp; touch $@;                                                 \
 	fi
 
 # Run msgfmt over all .po files to generate Java resource bundles
