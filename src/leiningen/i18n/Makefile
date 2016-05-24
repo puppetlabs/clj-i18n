@@ -45,6 +45,7 @@ locales/messages.pot: $(shell $(FIND_SOURCES)) | locales
 	               --msgid-bugs-address "docs@puppet.com"              \
 	               -ktrs:1 -ki18n/trs:1                                \
 	               -ktru:1 -ki18n/tru:1                                \
+	               -kmark:1 -ki18n/mark:1                              \
 	               -ktrun:1,2 -ki18n/trun:1,2                          \
 	               -ktrsn:1,2 -ki18n/trsn:1,2                          \
 	               --add-comments -o $tmp -f -;                        \

@@ -256,6 +256,10 @@
   [& args]
   `(translate-plural ~(namespace-munge *ns*) (system-locale) ~@args))
 
+;; Mark a message for extraction, without translation. This is useful when
+;; strings are defined at compile time but need to be translated at run time.
+(def mark identity)
+
 ;;
 ;; Ring middleware for language negotiation
 ;;
