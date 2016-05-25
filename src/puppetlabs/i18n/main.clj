@@ -1,7 +1,9 @@
 (ns puppetlabs.i18n.main
   "Some I18N examples"
   (:gen-class)
-  (:require [puppetlabs.i18n.core :as i18n :refer [tru trs trsn]]))
+  (:require [puppetlabs.i18n.core :as i18n :refer [tru trs trsn mark]]))
+
+(def ^:const const-string (mark "I do not speak German"))
 
 ;; Some simple examples of using tru/trs
 ;; The unit tests rely on the message catalog and translation generated for
@@ -16,6 +18,9 @@
 
   ;; Very simple localization
   (println (trs "Welcome! This is localized"))
+
+  ;; Localizing a previously-extracted string
+  (println (tru const-string))
 
   ;; Very simple plural system localization
   (doseq [beers (range 5 0 -1)]

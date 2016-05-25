@@ -81,6 +81,13 @@ patterns and need to be escaped with another single quote:
     ;; The following will produce "He's going to the store"
     (trs "He''s going to the store")
 
+### Separating message extraction from translation
+
+In some cases, messages need to be generated separately from when they're
+translated; this is common in specialized `def` forms or when defining a
+constant for reuse. In that case, use the `mark` macro to mark strings for
+xgettext extraction, and the standard `trs`/`tru` at the translation site.
+
 ### Development tools
 
 Extracting messages and building ResourceBundles requires the command line tools
