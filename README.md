@@ -127,6 +127,8 @@ code needs to do translations.
 You can manually regenerate these files by running `make i18n`. Additional
 information about the Make targets is available through running `make help`.
 
+**Note: `make i18n` will fail if you don't have at least one string wrapped with a translation function, i.e. trs or tru.**
+
 The i18n tools maintain files in three directories:
   * message catalogs in `locales/`
   * compiled translations in `resources/`

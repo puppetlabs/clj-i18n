@@ -23,8 +23,10 @@ what that `Makefile` can do for you. You should run `lein i18n init` every
 time the i18n library is updated to make sure you have the most recent
 `Makefile`.
 
+**Prior to running `make i18n`, you will need to have at least one string wrapped with a translation function, i.e. trs or tru.**
+
 Until you are comfortable with how `.po` files are handled, it is safest to
-only run `make i18n`, which is also run autoamtically every time `lein
+only run `make i18n`, which is also run automtically every time `lein
 compile` is run:
 
     > make i18n
