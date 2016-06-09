@@ -114,10 +114,11 @@ On Red Hat-based operating systems, including Fedora, install gettext via
      You should check these files into you source control system.
    * add hooks to the `compile` task that will refresh i18n data (equivalent of
      running `make i18n`)
-3. If there are namespaces/packages in your project with names which do not
-   start with a prefix derived from the project name, you'll need to list all
-   of your namespaces/package name prefixes in the `PACKAGES` variable in the
-   toplevel `Makefile` before the inclusion of the `dev-resources/Makefile.i18n`
+3. **If there are namespaces/packages in your project with names which do not
+   start with a prefix derived from the project name:** 
+   * you'll need to list all of your namespaces/package name prefixes in the 
+   `PACKAGES` variable in the top level `Makefile` before the inclusion of the 
+   `dev-resources/Makefile.i18n`
 
 This setup will ensure that the file `locales/messages.pot` and the translations
 in `locales/LANG.po` are updated every time you compile your project. Compiling
@@ -218,7 +219,7 @@ The code is set up as an ordinary leiningen project, with the one exception
 that you need to run `make` before running `lein test` or `lein run`, as
 there are messages that need to be turned into a message bundle.
 
-# Maintenance
+# Maintaineance
 
 Maintainers: David Lutterkort <lutter@puppetlabs.com> and Libby Molina <libby@puppetlabs.com>
 Tickets: File bug tickets at https://tickets.puppetlabs.com/browse/INTL, and add the `clj` component to the ticket.
