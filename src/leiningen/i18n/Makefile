@@ -54,7 +54,7 @@ locales/messages.pot: $(shell $(FIND_SOURCES)) | locales
 	sed -i.bak -e 's/charset=CHARSET/charset=UTF-8/' $$tmp;                 \
 	sed -i.bak -e 's/POT-Creation-Date: [^\\]*/POT-Creation-Date: /' $$tmp; \
 	rm -f $$tmp.bak;                                                        \
-	if ! diff -q -I POT-Creation-Date $$tmp $@ >& /dev/null; then           \
+	if ! diff -q -I POT-Creation-Date $$tmp $@ >/dev/null 2>&1; then        \
 	    mv $$tmp $@;                                                        \
 	else                                                                    \
 	    rm $$tmp; touch $@;                                                 \
