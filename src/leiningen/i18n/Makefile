@@ -19,6 +19,11 @@ LOCALES=$(basename $(notdir $(wildcard locales/*.po)))
 BUNDLE_DIR=$(subst .,/,$(BUNDLE))
 BUNDLE_FILES=$(patsubst %,resources/$(BUNDLE_DIR)/Messages_%.class,$(MESSAGE_LOCALE) $(LOCALES))
 FIND_SOURCES=find src -name \*.clj
+# xgettext before 0.19 does not understand --add-location=file. Even CentOS
+# 7 ships with an older gettext. We will therefore generate full location
+# info on those systems, and only file names where xgettext supports it
+LOC_OPT=$(shell xgettext --add-location=file -f - </dev/null >/dev/null 2>&1 && echo --add-location=file || echo --add-location)
+
 LOCALES_CLJ=resources/locales.clj
 define LOCALES_CLJ_CONTENTS
 {
@@ -49,7 +54,7 @@ locales/messages.pot: $(shell $(FIND_SOURCES)) | locales
 	               -ktru:1 -ki18n/tru:1                                     \
 	               -ktrun:1,2 -ki18n/trun:1,2                               \
 	               -ktrsn:1,2 -ki18n/trsn:1,2                               \
-	               --add-location=file                                      \
+	               $(LOC_OPT)                                               \
 	               --add-comments --sort-by-file                            \
 	               -o $$tmp -f -;                                           \
 	sed -i.bak -e 's/charset=CHARSET/charset=UTF-8/' $$tmp;                 \
