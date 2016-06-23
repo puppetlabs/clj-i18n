@@ -49,6 +49,7 @@ locales/messages.pot: $(shell $(FIND_SOURCES)) | locales
 	               -ktru:1 -ki18n/tru:1                                     \
 	               -ktrun:1,2 -ki18n/trun:1,2                               \
 	               -ktrsn:1,2 -ki18n/trsn:1,2                               \
+	               --add-location=file                                      \
 	               --add-comments --sort-by-file                            \
 	               -o $$tmp -f -;                                           \
 	sed -i.bak -e 's/charset=CHARSET/charset=UTF-8/' $$tmp;                 \

@@ -18,25 +18,25 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: src/puppetlabs/i18n/main.clj:6
+#: src/puppetlabs/i18n/main.clj
 msgid "I do not speak German"
 msgstr ""
 
 #. Very simple localization
-#: src/puppetlabs/i18n/main.clj:21
+#: src/puppetlabs/i18n/main.clj
 msgid "Welcome! This is localized"
 msgstr ""
 
-#: src/puppetlabs/i18n/main.clj:28
+#: src/puppetlabs/i18n/main.clj
 msgid "There is one bottle of beer on the wall."
 msgid_plural "There are {0} bottles of beer on the wall."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/puppetlabs/i18n/main.clj:35
+#: src/puppetlabs/i18n/main.clj
 msgid "It took {0} programmers {1} months to implement this"
 msgstr ""
 
-#: src/puppetlabs/i18n/main.clj:40
+#: src/puppetlabs/i18n/main.clj
 msgid "There are {0,number,integer} bicycles in Beijing"
 msgstr ""
