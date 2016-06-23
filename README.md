@@ -218,7 +218,7 @@ The code is set up as an ordinary leiningen project, with the one exception
 that you need to run `make` before running `lein test` or `lein run`, as
 there are messages that need to be turned into a message bundle.
 
-# Maintaineance
+# Maintenance
 
 Maintainers: David Lutterkort <lutter@puppetlabs.com> and Libby Molina <libby@puppetlabs.com>
 Tickets: File bug tickets at https://tickets.puppetlabs.com/browse/INTL, and add the `clj` component to the ticket.
