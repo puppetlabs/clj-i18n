@@ -61,14 +61,16 @@
     (map #(-> % slurp read-string (assoc :source %) check-locales check-and-normalize-packages)
          (info-files))))
 
-(defn info-map
-  "Turn the result of infos into a map mapping the package name to locales
-  and bundle name.
+(def string-length-comparator
+  (reify java.util.Comparator
+    (compare [_ lhs rhs]
+      (clojure.core/compare (count rhs) (count lhs)))))
 
-  To facilitate testing, we allow multiple infos with the same :package as
-  long as they agree on the :bundle. The result of such a setup is that
-  the :locales for such a package are the union of all the locales from
-  those info files"
+(defn info-map'
+  "Forces the parsing of the `locale.clj` file and creation of the
+  bundle `info-map`. This information doesn't change after startup and
+  thus the cached value `info-map` should be used rather than calling
+  this function directly"
   []
   (letfn [(merge-entry [old new package]
             (if (some? old)
@@ -80,24 +82,34 @@
                    :source  (let [source-old (:source old)
                                   source-new (:source new)]
                               (clojure.set/union
-                                (if (set? source-old) source-old #{source-old})
-                                (if (set? source-new) source-new #{source-new})))}
+                               (if (set? source-old) source-old #{source-old})
+                               (if (set? source-new) source-new #{source-new})))}
                   (throw
-                    (Exception.
-                      (format "Invalid locales info: %s and %s are both for package %s but set different bundles %s and %s"
-                              (:source old) (:source new)
-                              package
-                              bundle-old bundle-new)))))
+                   (Exception.
+                    (format "Invalid locales info: %s and %s are both for package %s but set different bundles %s and %s"
+                            (:source old) (:source new)
+                            package
+                            bundle-old bundle-new)))))
               new))]
     (reduce
-      (fn [map item]
-        (let [packages (:packages item)
-              item (dissoc item :packages)]
-          (reduce
-            (fn [map package]
-              (update-in map [package] merge-entry item package))
-            map packages)))
-      {} (infos))))
+     (fn [map item]
+       (let [packages (:packages item)
+             item (dissoc item :packages)]
+         (reduce
+          (fn [map package]
+            (update-in map [package] merge-entry item package))
+          map packages)))
+     (sorted-map-by string-length-comparator) (infos))))
+
+(def info-map
+  "Turn the result of infos into a map mapping the package name to
+  locales and bundle name.
+
+  To facilitate testing, we allow multiple infos with the
+  same :package as long as they agree on the :bundle. The result of
+  such a setup is that the :locales for such a package are the union
+  of all the locales from those info files"
+  (delay (info-map')))
 
 (defn available-locales
   "Return a list of all the locales for which we have translations based on
@@ -154,12 +166,13 @@
 ;;; ResourceBundles
 (defn bundle-for-namespace
   "Find the name of the ResourceBundle for the given namespace name"
-  [namespace]
-  (let [info-map (info-map)]
-    (:bundle
-      (get info-map
-           (first (filter #(.startsWith namespace %)
-                          (reverse (sort-by count (keys info-map)))))))))
+  ([namespace]
+   (bundle-for-namespace @info-map namespace))
+  ([i18n-info-map namespace]
+   (:bundle
+    (get i18n-info-map
+         (first (filter #(.startsWith namespace %)
+                        (keys i18n-info-map)))))))
 
 (defmacro bundle-name
   "Return the name of the ResourceBundle that the trs and tru macros will use"
