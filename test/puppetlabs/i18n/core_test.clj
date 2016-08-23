@@ -99,45 +99,55 @@
   []
   [(io/resource "test-locales/multi-pacakge-es.clj")])
 
+(defn overlapping-pacakge-locale-file
+  []
+  [(io/resource "test-locales/overlapping-packages.clj")])
+
 (deftest test-infos
   (with-redefs
     [puppetlabs.i18n.core/info-files one-locale-file]
     (testing "info-map"
-      (is (= ["example.i18n"] (keys (info-map))))
-      (is (= "example.i18n.Messages" (:bundle (get (info-map) "example.i18n")))))
+      (is (= ["example.i18n"] (keys (info-map'))))
+      (is (= "example.i18n.Messages" (:bundle (get (info-map') "example.i18n")))))
     (testing "available-locales"
       (is (= #{"de" "ru" "es"} (available-locales)))))
+
+  (with-redefs
+    [puppetlabs.i18n.core/info-files overlapping-pacakge-locale-file]
+    (testing "info-map with overlapping packages"
+      (is (= ["example.i18n.another_package" "example.i18n" "example"] (keys (info-map'))))))
+
   (with-redefs
     [puppetlabs.i18n.core/info-files two-locale-files]
     (testing "info-map #2"
-      (is (= #{"example.i18n" "other.i18n"} (into #{} (keys (info-map)))))
-      (is (= "example.i18n.Messages" (:bundle (get (info-map) "example.i18n")))))
+      (is (= #{"example.i18n" "other.i18n"} (into #{} (keys (info-map')))))
+      (is (= "example.i18n.Messages" (:bundle (get (info-map') "example.i18n")))))
     (testing "available-locales #2"
       (is (= #{"it" "fr" "de" "ru" "es"} (available-locales))))
     (testing "bundle-for-namespace"
-      (is (= "example.i18n.Messages" (bundle-for-namespace "example.i18n")))
+      (is (= "example.i18n.Messages" (bundle-for-namespace (info-map') "example.i18n")))
       (is (= "example.i18n.Messages"
-             (bundle-for-namespace "example.i18n.dog.cat")))
-      (is (nil? (bundle-for-namespace "example")))
+             (bundle-for-namespace (info-map') "example.i18n.dog.cat")))
+      (is (nil? (bundle-for-namespace (info-map') "example")))
       (is (= "other.i18n.Messages"
-             (bundle-for-namespace "other.i18n.abbott.costello")))))
+             (bundle-for-namespace (info-map') "other.i18n.abbott.costello")))))
   (with-redefs
     [puppetlabs.i18n.core/info-files conflicting-locale-files]
     (testing "conflicting locales"
       (is (thrown-with-msg? Exception #"Invalid locales info: .* are both for package .* but set different bundles"
-                            (info-map)))))
+                            (info-map')))))
   (with-redefs
     [puppetlabs.i18n.core/info-files merge-locale-files]
     (testing "merged langauges"
       (is (= #{"de" "ru" "es" "eo"} (available-locales)))
-      (is (= 1 (count (info-map))))))
+      (is (= 1 (count (info-map'))))))
   (with-redefs
     [puppetlabs.i18n.core/info-files multi-pacakge-locale-file]
     (testing "multi package locales"
       (is (= "multi_package.i18n.Messages"
-             (bundle-for-namespace "example.i18n.abbott.costello")))
+             (bundle-for-namespace (info-map') "example.i18n.abbott.costello")))
       (is (= "multi_package.i18n.Messages"
-             (bundle-for-namespace "alternate.i18n.abbott.costello"))))))
+             (bundle-for-namespace (info-map') "alternate.i18n.abbott.costello"))))))
 
 (deftest test-as-number
   (testing "convert number strings properly"
