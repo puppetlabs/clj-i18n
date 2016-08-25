@@ -99,7 +99,7 @@
           (fn [map package]
             (update-in map [package] merge-entry item package))
           map packages)))
-     (sorted-map-by string-length-comparator) (infos))))
+     {} (infos))))
 
 (def info-map
   "Turn the result of infos into a map mapping the package name to
@@ -172,7 +172,7 @@
    (:bundle
     (get i18n-info-map
          (first (filter #(.startsWith namespace %)
-                        (keys i18n-info-map)))))))
+                        (reverse (sort-by count (keys i18n-info-map)))))))))
 
 (defmacro bundle-name
   "Return the name of the ResourceBundle that the trs and tru macros will use"
