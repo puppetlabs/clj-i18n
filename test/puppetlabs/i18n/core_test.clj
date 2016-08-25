@@ -101,7 +101,8 @@
 
 (defn overlapping-pacakge-locale-file
   []
-  [(io/resource "test-locales/overlapping-packages.clj")])
+  [(io/resource "test-locales/overlapping-packages.clj")
+   (io/resource "test-locales/multi-pacakge-es.clj")])
 
 (deftest test-infos
   (with-redefs
@@ -114,8 +115,14 @@
 
   (with-redefs
     [puppetlabs.i18n.core/info-files overlapping-pacakge-locale-file]
-    (testing "info-map with overlapping packages"
-      (is (= ["example.i18n.another_package" "example.i18n" "example"] (keys (info-map'))))))
+    (testing "bundle-for-namespace ordering with overlapping packages and same length namespaces"
+      (are [bundle i18n-ns]
+          (= bundle (bundle-for-namespace (info-map') i18n-ns))
+        "overlapped_package.i18n.Messages" "example"
+        "multi_package.i18n.Messages" "example.i18n"
+        "multi_package.i18n.Messages" "alternate.i18n"
+        "overlapped_package.i18n.Messages" "alt3rnat3.i18n"
+        "overlapped_package.i18n.Messages" "example.i18n.another_package")))
 
   (with-redefs
     [puppetlabs.i18n.core/info-files two-locale-files]
