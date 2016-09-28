@@ -33,7 +33,8 @@ would have this in your namespace declaration
 You use `trs`/`tru` very similar to how you use `format`, except that the
 format string must be a valid
 [`java.text.MessageFormat`](https://docs.oracle.com/javase/8/docs/api/java/text/MessageFormat.html)
-pattern. For example, you would write
+pattern. Note that these patterns offer support for localized formatting;
+see the Javadocs for details. For example, you would write
 
     (println (trs "It takes {0} software engineers {1} hours to change a light bulb" 3 9))
 
@@ -52,9 +53,9 @@ invocation with a comment; in the above example you might want to say
 
     ;; This is really just a silly example message. It gets the following
     ;; arguments:
-    ;; 0 : number of women (an integer)
-    ;; 1 : number of months (also an integer)
-    (println (trs "It takes {0} women {1} months to have a child" 3 9))
+    ;; 0 : number of software engineers (an integer)
+    ;; 1 : number of hours (also an integer)
+    (println (trs "It takes {0} software engineers {1} hours to change a light bulb" 3 9))
 
 The comment will be copied to `messages.pot` together with the actual
 message so that translators have some context on what they are working
@@ -115,8 +116,8 @@ On Red Hat-based operating systems, including Fedora, install gettext via
    * add hooks to the `compile` task that will refresh i18n data (equivalent of
      running `make i18n`)
 3. **If there are namespaces/packages in your project with names which do not
-   start with a prefix derived from the project name:** you'll need to list all 
-   of your namespaces/package name prefixes in the `PACKAGES` variable in the 
+   start with a prefix derived from the project name:** you'll need to list all
+   of your namespaces/package name prefixes in the `PACKAGES` variable in the
    top level `Makefile` before the inclusion of the `dev-resources/Makefile.i18n`
 
 This setup will ensure that the file `locales/messages.pot` and the translations
