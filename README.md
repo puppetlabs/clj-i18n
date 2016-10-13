@@ -45,6 +45,12 @@ to determine the level of pluralization.  Any additional arguments will be used 
 
     (println (trsn "We found one cute puppy" "We found {0} cute puppies" 5))
 
+### How to find the Strings
+
+Here is a crappy Ruby script that you can point at a Clojure source tree to find *most* of the strings that will need to be translated:
+
+https://github.com/cprice404/stringtracker/blob/master/getstrings.rb
+
 ### Comments for translators
 
 It is sometimes useful to tell the translator something about the message;
