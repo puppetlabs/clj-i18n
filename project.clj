@@ -8,6 +8,9 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.gnu.gettext/libintl "0.18.3"]]
 
+  :profiles {:dev {:dependencies [[puppetlabs/kitchensink "2.1.0"
+                                   :exclusions [org.clojure/clojure]]]}}
+
   :main puppetlabs.i18n.main
   :aot [puppetlabs.i18n.main]
 
