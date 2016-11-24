@@ -58,3 +58,16 @@
         (is (re-find #"X-Git-Ref\s+header\s+must\s+follow\s+the\s+Project-Id-Version" err))
         (is (re-find #"no\s+Project-Id-Version\s+header\s+was\s+found" err))
         (is (re-find (re-pattern (path po)) err))))))
+
+(deftest remove-line-numbers-test
+  (testing "the remove-line-numbers.sh script behaves as expected"
+    (let [numbered-po (temp-file-from-resource "i18n-rm-line-nos-test" ".po"
+                                               "test-pos/line-numbers.po")
+          proc (sh "src/leiningen/i18n/bin/remove-line-numbers.sh"
+                   (path numbered-po))]
+      (is (zero? (:exit proc)))
+      (let [post-script-contents (slurp numbered-po)]
+        (is (= post-script-contents
+               (-> (io/resource "test-pos/no-line-numbers.po")
+                 io/file
+                 slurp)))))))

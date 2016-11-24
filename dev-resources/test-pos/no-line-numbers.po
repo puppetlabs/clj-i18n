@@ -1,0 +1,35 @@
+# Esperanto test translations for puppetlabs.classifier package.
+# Copyright (C) 2016 Puppet Labs <docs@puppetlabs.com>
+# This file is distributed under the same license as the puppetlabs.classifier package.
+# Automatically generated, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: puppetlabs.classifier \n"
+"X-Git-Ref: deadb33f\n"
+"Report-Msgid-Bugs-To: docs@puppet.com\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: eo\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: src/puppetlabs/classifier/application/permissioned.clj
+msgid "access all groups"
+msgstr ""
+
+#: src/puppetlabs/classifier/application/permissioned.clj, src/puppetlabs/classifier/application/permissioned.clj
+msgid "create or delete children"
+msgstr ""
+
+#: src/puppetlabs/classifier/application/permissioned.clj
+msgid "edit parameter values"
+msgstr ""
+
+#: src/puppetlabs/classifier/application/permissioned.clj
+msgid "src/foo.clj:340"
+msgstr ""
