@@ -6,6 +6,7 @@
 
   :pedantic? :abort
   :dependencies [[org.clojure/clojure "1.6.0"]
+                 [cpath-clj "0.1.2"]
                  [org.gnu.gettext/libintl "0.18.3"]]
 
   :profiles {:dev {:dependencies [[puppetlabs/kitchensink "2.1.0"
