@@ -71,3 +71,42 @@
                (-> (io/resource "test-pos/no-line-numbers.po")
                  io/file
                  slurp)))))))
+
+(deftest compare-POTs-test
+  (testing "the compare-POTs.sh script"
+    (let [ref-pot (temp-file-from-resource "i18n-ref" ".pot"
+                                           "test-pos/diff-ref.pot")
+          cmp-script "src/leiningen/i18n/bin/compare-POTs.sh"
+          cmp-with (fn [resource-path]
+                     (let [tmp-prefix (-> resource-path
+                                        (str/replace #"^test-pos/" "")
+                                        (str/replace #"\.pot$" ""))
+                           diff-pot (temp-file-from-resource tmp-prefix ".pot"
+                                                             resource-path)]
+                       (sh cmp-script (path ref-pot) (path diff-pot))))]
+
+      (testing "finds differences when"
+        (let [diff-pot (temp-file-from-resource
+                         "i18n-whole-string" ".pot"
+                         "test-pos/diff-whole-string.pot")]
+
+          (testing "a string is added"
+            (let [cmp (sh cmp-script (path ref-pot) (path diff-pot))]
+              (is (not (zero? (:exit cmp))))))
+
+          (testing "a string is removed"
+            (let [cmp (sh cmp-script (path diff-pot) (path ref-pot))]
+              (is (not (zero? (:exit cmp)))))))
+
+        (testing "a string is changed only slightly"
+          (is (not (zero? (:exit (cmp-with "test-pos/diff-string-edit.pot")))))))
+
+      (testing "considers the POTs identical when only"
+        (testing "the order of the strings changes"
+          (is (zero? (:exit (cmp-with "test-pos/diff-order.pot")))))
+
+        (testing "the location comment of a string changes"
+          (is (zero? (:exit (cmp-with "test-pos/diff-location.pot")))))
+
+        (testing "a translation is added for a string"
+          (is (zero? (:exit (cmp-with "test-pos/diff-translated.pot")))))))))
