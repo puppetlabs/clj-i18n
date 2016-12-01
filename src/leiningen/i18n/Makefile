@@ -35,7 +35,7 @@ endef
 export LOCALES_CLJ_CONTENTS
 
 
-i18n: update-pot msgfmt
+i18n: msgfmt
 
 # Update locales/messages.pot
 update-pot: locales/messages.pot
