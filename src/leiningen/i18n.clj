@@ -4,7 +4,8 @@
             [leiningen.core.eval :as e]
             [clojure.java.io :as io]
             [clojure.pprint :as pprint]
-            [clojure.java.shell :as sh :refer [sh]]))
+            [clojure.java.shell :as sh :refer [sh]]
+            [cpath-clj.core :as cp]))
 
 (defn help
   []
@@ -60,6 +61,17 @@
            #"(?m)^BUNDLE=.*$"
            (str "BUNDLE=" (bundle-package-name project))))))
 
+(defn copy-scripts-to-dev-resources
+  [project]
+  (let [dest-dir (io/as-file (path-join (dev-resources-dir project) "i18n" "bin"))
+        scripts (cp/resources (io/resource "leiningen/i18n/bin"))]
+    (when-not (.exists dest-dir)
+      (.mkdirs dest-dir))
+    (doseq [[basename [script-uri]] scripts]
+      (let [dest-file (io/as-file (path-join (.getPath dest-dir) basename))]
+        (io/copy (io/input-stream script-uri) dest-file)
+        (.setExecutable dest-file true false))))) ; second false means set it for everyone
+
 (defn project-file
   "Construct a path in the project's root by appending rest to it and
   return a file"
@@ -91,14 +103,17 @@
 (defn edit-gitignore
   "Add generated i18n files that should not be checked in to .gitignore"
   [project]
-  (let [line "/resources/locales.clj"
+  (let [lines ["/resources/locales.clj" "/dev-resources/i18n/bin"]
         gitignore (project-file project ".gitignore")]
-    (ensure-contains-line gitignore line)))
+    (doseq [line lines]
+      (ensure-contains-line gitignore line))))
 
 (defn i18n-init
   [project]
   (l/info "Setting up Makefile; don't forget to check it in")
   (copy-makefile-to-dev-resources project)
+  (l/info "Adding i18n scripts in `dev-resources/i18n/bin`")
+  (copy-scripts-to-dev-resources project)
   (edit-toplevel-makefile project)
   (edit-gitignore project))
 
