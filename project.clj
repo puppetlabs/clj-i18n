@@ -1,4 +1,4 @@
-(defproject puppetlabs/i18n "0.6.0-SNAPSHOT"
+(defproject puppetlabs/i18n "0.5.2-SNAPSHOT"
   :description "Clojure i18n library"
   :url "http://github.com/puppetlabs/clj-i18n"
   :license {:name "Apache License, Version 2.0"
