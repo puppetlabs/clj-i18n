@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-repo_dir="$(realpath "$(dirname "$0")/../../..")"
+repo_dir="$(dirname "$0")/../../.."
 pot_file="$repo_dir/locales/messages.pot"
 compare_pots="$repo_dir/dev-resources/i18n/bin/compare-POTs.sh"
 
