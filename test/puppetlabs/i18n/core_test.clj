@@ -184,7 +184,7 @@
 
 (deftest test-negotiate-locale
   (with-redefs
-    [puppetlabs.i18n.core/message-locale #(string-as-locale "oc")]
+    [puppetlabs.i18n.core/system-locale #(string-as-locale "oc")]
     (let [check
           (fn [exp wanted]
             (is (= (string-as-locale exp)
@@ -204,7 +204,7 @@
 (deftest test-locale-negotiator
   (with-redefs
     [puppetlabs.i18n.core/available-locales (fn [] #{"de" "fr-FR" "en"})
-     puppetlabs.i18n.core/message-locale #(string-as-locale "oc")]
+     puppetlabs.i18n.core/system-locale #(string-as-locale "oc")]
     (let [neg        (locale-negotiator (fn [request] (user-locale)))
           mk-request (fn [accept]
                        {:headers {"accept-language" accept}})
@@ -215,10 +215,10 @@
         (check "de" "de")
         (check "de" "de_DE, de;q=0.9, en;q=0.8")
         (check "oc" "it, fr"))
-      (testing "falls back to message-locale for empty/invalid headers"
+      (testing "falls back to system-locale for empty/invalid headers"
         (map #(check "oc" %) ["" nil "en;q=garbage" ",,," ",;," "xyz" "de-US"])
-        (is (= (message-locale) (neg {:headers {}})))
-        (is (= (message-locale) (neg {}))))
+        (is (= (system-locale) (neg {:headers {}})))
+        (is (= (system-locale) (neg {}))))
       (testing "conveys the locale"
         (is (= (string-as-locale "de")
                ((locale-negotiator (fn [request] @(future (user-locale))))

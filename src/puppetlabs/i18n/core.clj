@@ -311,7 +311,7 @@
   in wanted that is available, and return the corresponding Locale object.
 
   This function will always return a locale. If we can't negotiate a
-  suitable locale, we fall back to the message-locale"
+  suitable locale, we fall back to the system-locale"
   [wanted available]
   ;; @todo lutter 2015-05-20: if wanted contains only a country-specific
   ;; variant, and we have the general variant, we might want to match those
@@ -323,7 +323,7 @@
   ;; falling back to the message locale
   (if-let [loc (some available wanted)]
     (string-as-locale loc)
-    (message-locale)))
+    (system-locale)))
 
 (defn locale-negotiator
   "Ring middleware that performs locale negotiation.
