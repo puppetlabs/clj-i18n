@@ -12,7 +12,7 @@ MESSAGE_LOCALE=en
 BUNDLE=puppetlabs.i18n
 
 # The name of the POT file into which the gettext code strings (msgid) will be placed
-POT_NAME=""
+POT_NAME=messages.pot
 
 # The list of names of packages covered by the translation bundle;
 # by default it contains a single package - the same where the translations
