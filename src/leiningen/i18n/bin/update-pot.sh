@@ -2,8 +2,10 @@
 
 set -eo pipefail
 
+POT_NAME=""
+
 repo_dir="$(dirname "$0")/../../.."
-pot_file="$repo_dir/locales/messages.pot"
+pot_file="$repo_dir/locales/$POT_NAME"
 compare_pots="$repo_dir/dev-resources/i18n/bin/compare-POTs.sh"
 
 git_branch="$1";
@@ -61,7 +63,7 @@ if ! "$compare_pots" "$old_pot" "$new_pot"; then
   ./dev-resources/i18n/bin/add-gitref.sh "$new_pot"
 
   git add "$new_pot"
-  git commit -m "(i18n) Update strings in messages.pot file"
+  git commit -m "(i18n) Update strings in $POT_NAME file"
 
   echo ""
   echo "Pushing updated POT file to GitHub"

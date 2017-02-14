@@ -2,8 +2,10 @@
   "Plugin for i18n tasks. Start by using i18n init"
   (:require [leiningen.core.main :as l]
             [leiningen.core.eval :as e]
+            [leiningen.i18n.utils :as utils]
             [clojure.java.io :as io]
             [clojure.pprint :as pprint]
+            [clojure.string :as cstr]
             [clojure.java.shell :as sh :refer [sh]]
             [cpath-clj.core :as cp]))
 
@@ -47,19 +49,20 @@
   [project]
   (namespace-munge
    (str (or (:group project) "nogroup") "."
-        (clojure.string/replace (:name project) "/" "."))))
+        (cstr/replace (:name project) "/" "."))))
 
 (defn copy-makefile-to-dev-resources
   [project]
   (let [dest (path-join (dev-resources-dir project) "Makefile.i18n")
         makefile (io/resource "leiningen/i18n/Makefile")]
     (spit (io/as-file dest)
-          (clojure.string/replace-first
-           (slurp makefile)
-           ; use RegExp's m flag - (?m) - so that ^/$ matach start/end of line rather than
-           ; start/end of the entire string
-           #"(?m)^BUNDLE=.*$"
-           (str "BUNDLE=" (bundle-package-name project))))))
+          (-> (utils/replace-first-in-multiline
+                (slurp makefile)
+                #"BUNDLE=.*"
+                (str "BUNDLE=" (bundle-package-name project)))
+              (utils/replace-first-in-multiline
+                #"POT_NAME=.*"
+                (str "POT_NAME=" (:name project) ".pot"))))))
 
 (defn copy-scripts-to-dev-resources
   [project]
@@ -78,6 +81,18 @@
   [project & rest]
   (let [root (:root project)]
     (io/as-file (apply path-join (cons root rest)))))
+
+(defn update-scripts-with-pot-name
+  "CI script task needs to know the name of the POT file to be modified and
+   committed. This will insert the correct name of the POT in the /bin files."
+  [project]
+  (let [dest (path-join (dev-resources-dir project) "i18n" "bin" "update-pot.sh")
+        pot-script (io/resource "leiningen/i18n/bin/update-pot.sh")]
+    (spit (io/as-file dest)
+          (utils/replace-first-in-multiline
+               (slurp pot-script)
+               #"POT_NAME=.*"
+               (str "POT_NAME=" (:name project) ".pot")))))
 
 (defn ensure-contains-line
   "Make sure that file contains the given line, if not append it. If file
@@ -114,6 +129,7 @@
   (copy-makefile-to-dev-resources project)
   (l/info "Adding i18n scripts in `dev-resources/i18n/bin`")
   (copy-scripts-to-dev-resources project)
+  (update-scripts-with-pot-name project)
   (edit-toplevel-makefile project)
   (edit-gitignore project))
 

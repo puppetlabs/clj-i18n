@@ -63,7 +63,7 @@ invocation with a comment; in the above example you might want to say
     ;; 1 : number of hours (also an integer)
     (println (trs "It takes {0} software engineers {1} hours to change a light bulb" 3 9))
 
-The comment will be copied to `messages.pot` together with the actual
+The comment will be copied to `<project-name>.pot` together with the actual
 message so that translators have some context on what they are working
 on. Note that such comments must be immediately preceding the string that
 is the message. When you write
@@ -72,7 +72,7 @@ is the message. When you write
     (trs
       "A message on another line")
 
-the comments do *not* get extracted into `messages.pot`.
+the comments do *not* get extracted into `<project-name>.pot`.
 
 ### Single quotes in messages
 
@@ -121,7 +121,9 @@ On Red Hat-based operating systems, including Fedora, install gettext via
      into an existing toplevel `Makefile` resp. create a new one that does that.
      You should check these files into you source control system.
    * put scripts for comparing and updating PO & POT files in
-     `dev-resources/i18n/bin`. These are used by [the clj-i18n CI job][ci-job]
+     `dev-resources/i18n/bin`. (These scripts and the Makefile.i18n are updated to
+     include your project name, so that the POT file will be named after your project.)
+     These are used by [the clj-i18n CI job][ci-job]
      and can be ignored (they are added to the project's .gitignore file).
    * add hooks to the `compile` task that will rebuild the resource bundles
      (equivalent of running `make i18n`).
@@ -206,18 +208,27 @@ certain test should run, for example, with
 ```
 
 ## Translator usage
+Translators for Puppet, don't use this workflow.  In the Puppet workflow POs are generated in our translation tool, from an up to date POT.  We don't, as developers, update or commit POs. So this may only be relevant should a developer want to test or generate a test language.
 
-When a translator gets ready to translate messages, they need to update the
-corresponding `.po` file. For example, to update German translations,
-they'd run
+### Generate a test .po file
+Prior to generating a po file, make sure the POT is up to date by running `make i18n`.
+This will put new msgids from the app, into the POT.
 
-    make locales/de.po
+To create a `.po` file for the language eo:
 
-and then edit `locales/de.po`. The plugin actually performs the `make`
-invocation above every time you compile the project, so you should only
-have to do it manually to add a PO file for a new locale. Translators
-should be able to work off the PO files that are checked into source
-control, as they are always kept 'fresh' by the plugin.
+    make locales/eo.po
+
+Note this will just take the contents of the current POT and write the PO from it.
+Subsequent runs will not keep that file up to date.
+
+### Update a test .po file
+Prior to updating a po file, make sure the POT is up to date by running `make i18n`.
+This will put new msgids from the app, into the POT.
+
+To update the po:
+    msgmerge -U locales/eo.po locales/<project-name>.pot
+
+This uses the contents of the current POT to update msgids in the target po (eo.po).
 
 ## Release usage
 
