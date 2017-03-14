@@ -9,6 +9,8 @@
 
 (def de (string-as-locale "de-DE"))
 (def eo (string-as-locale "eo"))
+(def en (string-as-locale "en-US"))
+
 (def welcome_en "Welcome! This is localized")
 (def welcome_de "Willkommen ! Draußen nur Kännchen")
 (def welcome_eo "Welcome_pseudo_localized")
@@ -20,7 +22,6 @@
 
 (def six_bottle_en "There are 6 bottles of beer on the wall.")
 (def six_bottle_de "Es gibt 6 Flaschen Bier an der Wand.")
-
 
 (deftest handling-of-user-locale
   (testing "user-locale defaults to system-locale"
@@ -64,13 +65,49 @@
 
 
 (deftest test-trsn
-  (testing "trun with no user locale"
+  (testing "trsn with no user locale"
     (is (= one_bottle_en (trsn one_bottle n_bottles 1)))
     (is (= six_bottle_en (trsn one_bottle n_bottles 6))))
-  (testing "trun with a user locale"
+  (testing "trsn with a user locale"
     (with-user-locale de (is (= one_bottle_en (trsn one_bottle n_bottles 1))))
     (with-user-locale de (is (= six_bottle_en (trsn one_bottle n_bottles 6))))))
 
+
+(deftest test-empty-string-msgid-fallback-to-pot-no-header
+  (testing "trsn with no user locale"
+      (is (= "" (trsn "" "" 1)))
+      (is (= "" (trsn "" "" 6)))
+      (is (= "" (trsn "" "fred" 1)))
+      (is (= "fred" (trsn "" "fred" 6)))
+      ; msgid/msgstr not in po/bundle render correctly
+      (is (= "fred" (trsn "fred" "" 1)))
+      (is (= "" (trsn "fred" "" 6))))
+  (testing "trsn with a user locale"
+      (with-user-locale de
+        (is (= "" (trsn "" "" 1)))
+        (is (= "" (trsn "" "" 6)))
+        (is (= "" (trsn "" "fred" 1)))
+        (is (= "fred" (trsn "" "fred" 6)))
+        ; msgid/msgstr not in po/bundle render correctly
+        (is (= "fred" (trsn "fred" "" 1)))
+        (is (= "" (trsn "fred" "" 6)))))
+  (testing "trun can display an empty string"
+    (with-user-locale de
+      (is (= "" (trun "" "" 1)))
+      (is (= "" (trun "" "" 6)))
+      (is (= "" (trun "" "fred" 1)))
+      (is (= "fred" (trun "" "fred" 6)))
+      ; msgid/msgstr not in po/bundle render correctly
+      (is (= "fred" (trun "fred" "" 1)))
+      (is (= "" (trun "fred" "" 6)))))
+  (testing "trs can display an empty string"
+    (with-user-locale de
+      (is (= "" (trs "")))
+      (is (= " " (trs " ")))))
+  (testing "tru can display an empty string"
+    (with-user-locale de
+      (is (= "" (tru "")))
+      (is (= " " (tru " "))))))
 ;;
 ;; Helper files in dev-resources; they have the same format as the
 ;; locales.clj file that the Makefile generates

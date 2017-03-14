@@ -200,7 +200,7 @@
   contain an entry for msg, return msg itself"
   [namespace loc msg]
   (let [bundle (get-bundle namespace loc)]
-    (if bundle
+    (if (and bundle (not-empty msg))
       (try
         (gnu.gettext.GettextResource/gettext bundle msg)
         (catch java.util.MissingResourceException e
@@ -214,7 +214,7 @@
   contain an entry for msg, return msg itself"
   [namespace loc msgid msgid-plural count]
   (let [bundle (get-bundle namespace loc)]
-    (if bundle
+    (if (and bundle (not-empty msgid))
       (try
         (gnu.gettext.GettextResource/ngettext bundle msgid msgid-plural count)
         (catch java.util.MissingResourceException e
