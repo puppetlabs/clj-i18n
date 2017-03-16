@@ -74,9 +74,9 @@ locales/$(POT_NAME): $(shell $(FIND_SOURCES)) | locales
 # and create the locales.clj file
 msgfmt: $(BUNDLE_FILES) $(LOCALES_CLJ)
 
-# force rebuild of locales.clj if its contents is not the
-# the desired one
-ifneq ($(shell cat $(LOCALES_CLJ) 2> /dev/null),$(shell echo '$(subst ','\'',$(LOCALES_CLJ_CONTENTS))'))
+# Force rebuild of locales.clj if its contents is not the the desired one. The
+# shell echo is used to add a trailing newline to match the one from `cat`
+ifneq ($(shell cat $(LOCALES_CLJ) 2> /dev/null),$(shell echo '$(LOCALES_CLJ_CONTENTS)'))
 .PHONY: $(LOCALES_CLJ)
 endif
 $(LOCALES_CLJ): | resources
