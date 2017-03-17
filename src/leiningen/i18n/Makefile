@@ -4,10 +4,6 @@
 #   lein i18n init
 #
 
-# The locale in which our messages are written, and for which we therefore
-# have messages without any further effort
-MESSAGE_LOCALE=en
-
 # The name of the package into which the translations bundle will be placed
 BUNDLE=puppetlabs.i18n
 
@@ -21,7 +17,7 @@ POT_NAME=messages.pot
 PACKAGES?=$(BUNDLE)
 LOCALES=$(basename $(notdir $(wildcard locales/*.po)))
 BUNDLE_DIR=$(subst .,/,$(BUNDLE))
-BUNDLE_FILES=$(patsubst %,resources/$(BUNDLE_DIR)/Messages_%.class,$(MESSAGE_LOCALE) $(LOCALES))
+BUNDLE_FILES=$(patsubst %,resources/$(BUNDLE_DIR)/Messages_%.class,$(LOCALES))
 FIND_SOURCES=find src -name \*.clj
 # xgettext before 0.19 does not understand --add-location=file. Even CentOS
 # 7 ships with an older gettext. We will therefore generate full location
@@ -31,7 +27,7 @@ LOC_OPT=$(shell xgettext --add-location=file -f - </dev/null >/dev/null 2>&1 && 
 LOCALES_CLJ=resources/locales.clj
 define LOCALES_CLJ_CONTENTS
 {
-  :locales  #{$(patsubst %,"%",$(MESSAGE_LOCALE) $(LOCALES))}
+  :locales  #{$(patsubst %,"%",$(LOCALES))}
   :packages [$(patsubst %,"%",$(PACKAGES))]
   :bundle   $(patsubst %,"%",$(BUNDLE).Messages)
 }
@@ -72,22 +68,30 @@ locales/$(POT_NAME): $(shell $(FIND_SOURCES)) | locales
 
 # Run msgfmt over all .po files to generate Java resource bundles
 # and create the locales.clj file
-msgfmt: $(BUNDLE_FILES) $(LOCALES_CLJ)
+msgfmt: $(BUNDLE_FILES) $(LOCALES_CLJ) clean-orphaned-bundles
 
-# force rebuild of locales.clj if its contents is not the
-# the desired one
-ifneq ($(shell cat $(LOCALES_CLJ) 2> /dev/null),$(shell echo '$(subst ','\'',$(LOCALES_CLJ_CONTENTS))'))
+# Force rebuild of locales.clj if its contents is not the the desired one. The
+# shell echo is used to add a trailing newline to match the one from `cat`
+ifneq ($(shell cat $(LOCALES_CLJ) 2> /dev/null),$(shell echo '$(LOCALES_CLJ_CONTENTS)'))
 .PHONY: $(LOCALES_CLJ)
 endif
 $(LOCALES_CLJ): | resources
 	@echo "Writing $@"
 	@echo "$$LOCALES_CLJ_CONTENTS" > $@
 
+# Remove every resource bundle that wasn't generated from a PO file.
+# We do this because we used to generate the english bundle directly from the POT.
+.PHONY: clean-orphaned-bundles
+clean-orphaned-bundles:
+	@for bundle in resources/$(BUNDLE_DIR)/Messages_*.class; do                                  \
+	  locale=$$(basename "$$bundle" | sed -E -e 's/\$$?1?\.class$$/_class/' | cut -d '_' -f 2;); \
+	  if [ ! -f "locales/$$locale.po" ]; then                                                    \
+	    rm "$$bundle";                                                                           \
+	  fi                                                                                         \
+	done
+
 resources/$(BUNDLE_DIR)/Messages_%.class: locales/%.po | resources
 	msgfmt --java2 -d resources -r $(BUNDLE).Messages -l $(*F) $<
-
-resources/$(BUNDLE_DIR)/Messages_$(MESSAGE_LOCALE).class: locales/$(POT_NAME) | resources
-	msgfmt --java2 -d resources -r $(BUNDLE).Messages -l $(MESSAGE_LOCALE) $<
 
 # Use this to initialize translations. Updating the PO files is done
 # automatically through a CI job that utilizes the scripts in the project's
