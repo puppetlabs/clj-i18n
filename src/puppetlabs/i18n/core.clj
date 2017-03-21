@@ -14,6 +14,18 @@
            (.getResources "locales.clj")
            enumeration-seq))
 
+(defn parse-info-file
+  "This function will handle the normal locales.clj file the Makefile builds in
+  a project or a list of the the locales.clj maps which we construct when we
+  build the single locales.clj that goes into an uberjar."
+  [info-file-path]
+  (let [data-structure (-> info-file-path
+                           slurp
+                           read-string)]
+    (if (map? data-structure)
+      [(assoc data-structure :source info-file-path)]
+      (map #(assoc % :source info-file-path) data-structure))))
+
 (defn infos
   "Read all the locales.clj files on the classpath and return them as an
   array of maps. There is one locales.clj file per Clojure project.
@@ -58,8 +70,9 @@
              (Exception.
                (format "Invalid locales info: %s: missing :packages"
                        (:source item)))))))]
-    (map #(-> % slurp read-string (assoc :source %) check-locales check-and-normalize-packages)
-         (info-files))))
+    (->> (info-files)
+         (mapcat parse-info-file)
+         (map (comp check-and-normalize-packages check-locales)))))
 
 (def string-length-comparator
   (reify java.util.Comparator

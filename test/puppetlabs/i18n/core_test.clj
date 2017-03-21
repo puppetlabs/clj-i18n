@@ -127,6 +127,10 @@
    (io/resource "test-locales/merge-eo.clj")
    (io/resource "test-locales/conflicting-de.clj")])
 
+(defn uberjar-locale-file
+  []
+  [(io/resource "test-locales/uberjar-en-de.clj")])
+
 (defn merge-locale-files
   []
   [(io/resource "test-locales/de-ru-es.clj")
@@ -180,6 +184,14 @@
     (testing "conflicting locales"
       (is (thrown-with-msg? Exception #"Invalid locales info: .* are both for package .* but set different bundles"
                             (info-map')))))
+  (with-redefs
+    [puppetlabs.i18n.core/info-files uberjar-locale-file]
+    (testing "info-map"
+      (is (= #{"puppetlabs.i18n" "puppetlabs.foo"} (set (keys (info-map')))))
+      (is (= "puppetlabs.foo.Messages" (:bundle (get (info-map') "puppetlabs.foo"))))
+      (is (= "puppetlabs.i18n.Messages" (:bundle (get (info-map') "puppetlabs.i18n")))))
+    (testing "available-locales"
+      (is (= #{"de" "en" "fr"} (available-locales)))))
   (with-redefs
     [puppetlabs.i18n.core/info-files merge-locale-files]
     (testing "merged langauges"

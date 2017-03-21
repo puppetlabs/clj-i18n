@@ -115,7 +115,14 @@ On Red Hat-based operating systems, including Fedora, install gettext via
 
 1. In your `project.clj`, add `[puppetlabs/i18n "0.5.0"]` to your project's
    :plugins and :dependencies vectors (without the version number in
-   :dependencies if your project uses clj-parent).
+   :dependencies if your project uses clj-parent). Also add
+   ```
+   :uberjar-merge-with {"locales.clj"  [(comp read-string slurp)
+                                        (fn [new prev]
+                                          (if (map? prev) [new prev] (conj prev new)))
+                                        #(spit %1 (pr-str %2))]}
+   ```
+   to merge in the translation locales.clj from upstream projects.
 2. Run `lein i18n init`. This will
    * put a `Makefile.i18n` into `dev-resources/` in your project and include it
      into an existing toplevel `Makefile` resp. create a new one that does that.
