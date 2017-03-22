@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# This bootstraps the resources so that tests can pass
+make i18n
