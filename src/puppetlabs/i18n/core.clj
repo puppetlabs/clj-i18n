@@ -2,6 +2,7 @@
   (:gen-class)
   (:require [clojure.java.io :as io]
             [clojure.set]
+            [clojure.edn :as edn]
             [clojure.string :as str]))
 
 ;;; General setup/info
@@ -21,7 +22,7 @@
   [info-file-path]
   (let [data-structure (-> info-file-path
                            slurp
-                           read-string)]
+                           edn/read-string)]
     (if (map? data-structure)
       [(assoc data-structure :source info-file-path)]
       (map #(assoc % :source info-file-path) data-structure))))
