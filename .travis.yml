@@ -1,0 +1,9 @@
+language: clojure
+lein: 2.7.1
+jdk:
+- openjdk7
+- oraclejdk8
+script: "./ext/travisci/test.sh"
+branches:
+  only:
+    - master
