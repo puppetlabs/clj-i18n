@@ -254,7 +254,10 @@
   needed. Messages are looked up in the resource bundle associated with the
   given namespace"
   [namespace loc msg & args]
-  (fmt loc (lookup namespace loc msg) (to-array args)))
+  (let [translated (lookup namespace loc msg)]
+    (if (nil? args)
+      translated
+      (fmt loc translated (to-array args)))))
 
 (defn translate-plural
   "Translate a message into the given locale, interpolating as

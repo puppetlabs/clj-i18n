@@ -38,10 +38,17 @@
 
 (deftest test-tru
   (testing "tru with no user locale"
-    (is (= welcome_en (tru welcome_en))))
+    (is (= welcome_en (tru welcome_en)))
+    (is (= "Fred and George walked up the hill." (tru "{0} and {1} walked up the hill." "Fred" "George")))
+    ; if formatting is really applied, the result comes back without the date formatting hint
+    (is (= "Fake formatted string {0, date}" (tru "Fake formatted string {0, date}"))))
+
   (testing "tru in German"
     (with-user-locale de
-      (is (= welcome_de (tru welcome_en)))))
+      (is (= welcome_de (tru welcome_en)))
+      (is (= "Fred und George gingen den Hügel hinauf."
+             (tru "{0} and {1} walked up the hill." "Fred" "George")))))
+
   (testing "tru in Esperanto"
     ;; We use Esperanto as our test locale
     (with-user-locale eo
@@ -58,11 +65,15 @@
 
 (deftest test-trs
   (testing "trs with no user locale"
-    (is (= welcome_en (trs welcome_en))))
+    (is (= welcome_en (trs welcome_en)))
+    (is (= "Formatted string zero one two" (trs "Formatted string {0} {1} {2}" "zero" "one" "two")))
+    ; if formatting is really applied, the result comes back without the date formatting hint
+    (is (= "Fake formatted string {0, date}" (trs "Fake formatted string {0, date}"))))
   (testing "trs with a user locale"
     (with-user-locale de
-      (is (= welcome_en (trs welcome_en))))))
-
+      (is (= welcome_en (trs welcome_en)))
+      (is (= "Fred and George walked up the hill."
+             (trs "{0} and {1} walked up the hill." "Fred" "George"))))))
 
 (deftest test-trsn
   (testing "trsn with no user locale"

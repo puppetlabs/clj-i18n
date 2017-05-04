@@ -113,7 +113,7 @@ On Red Hat-based operating systems, including Fedora, install gettext via
 
 [![Clojars Project](https://img.shields.io/clojars/v/puppetlabs/i18n.svg)](https://clojars.org/puppetlabs/i18n)
 
-1. In your `project.clj`, add `[puppetlabs/i18n "0.5.0"]` to your project's
+1. In your `project.clj`, add `[puppetlabs/i18n "0.8.0"]` to your project's
    :plugins and :dependencies vectors (without the version number in
    :dependencies if your project uses clj-parent). Also add
    ```

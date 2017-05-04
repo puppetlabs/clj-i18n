@@ -19,6 +19,9 @@
   ;; Very simple localization
   (println (trs "Welcome! This is localized"))
 
+  ;; simple string formatting demonstration
+  (println (trs "{0} and {1} walked up the hill." "Jack" "Jill"))
+
   ;; Localizing a previously-extracted string
   (println (tru const-string))
 
