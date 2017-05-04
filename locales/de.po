@@ -21,6 +21,11 @@ msgstr ""
 msgid "I do not speak German"
 msgstr "Ich spreche kein Deutsch"
 
+#. simple string formatting demonstration
+#: src/puppetlabs/i18n/main.clj
+msgid "{0} and {1} walked up the hill."
+msgstr "{0} und {1} gingen den Hügel hinauf."
+
 #. Very simple localization
 #: src/puppetlabs/i18n/main.clj
 msgid "Welcome! This is localized"
@@ -42,3 +47,4 @@ msgstr "In Peking gibt es {0,number,integer} Fahrräder"
 
 #~ msgid "This is another test string"
 #~ msgstr "german german german german german"
+

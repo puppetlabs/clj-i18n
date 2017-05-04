@@ -3,9 +3,12 @@
 # This file is distributed under the same license as the puppetlabs.i18n package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#. Localizing an empty string
+#: src/puppetlabs/i18n/main.clj
 #, fuzzy
 msgid ""
-msgstr ""
+msgid_plural ""
+msgstr[0] ""
 "Project-Id-Version: puppetlabs.i18n \n"
 "Report-Msgid-Bugs-To: docs@puppet.com\n"
 "POT-Creation-Date: \n"
@@ -39,4 +42,9 @@ msgstr ""
 
 #: src/puppetlabs/i18n/main.clj
 msgid "There are {0,number,integer} bicycles in Beijing"
+msgstr ""
+
+#. simple string formatting demonstration
+#: src/puppetlabs/i18n/main.clj
+msgid "{0} and {1} walked up the hill."
 msgstr ""
