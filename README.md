@@ -45,6 +45,25 @@ to determine the level of pluralization.  Any additional arguments will be used 
 
     (println (trsn "We found one cute puppy" "We found {0} cute puppies" 5))
 
+Use `format` to keep whitespace out of translations:
+Replace the following string
+
+    (str "Verification of client "
+      client
+      " provided by HTTP header "
+      header
+      "\nSee documentation for details\n")
+
+with something like:
+
+    (format "%s\n%s\n"
+      (trs "Verification of client {0} provided by HTTP header {1}" client header)
+      (trs "See documentation for details"))
+
+Note that `trs` and `tru` work exactly the same way as `format` in clojure, and
+that it does not concatenate the way `str` does. If used this way, `trs` and
+`tru` will only recognize the first string given and no exception will be thrown.
+
 ### How to find the Strings
 
 Here is a crappy Ruby script that you can point at a Clojure source tree to find *most* of the strings that will need to be translated:
