@@ -167,7 +167,7 @@
 ;; we need to make sure we have the right one. For example, "en_US" leads
 ;; to a bad locale, whereas "en-us" works
 (defn string-as-locale [loc]
-  (java.util.Locale/forLanguageTag loc))
+  (java.util.Locale/forLanguageTag (clojure.string/replace loc "_" "-")))
 
 (defn message-locale
   "The locale of the untranslated messages. This is used as a fallback if
