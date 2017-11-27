@@ -253,14 +253,14 @@
   "Translate a message into the given locale, interpolating as
   needed. Messages are looked up in the resource bundle associated with the
   given namespace"
-  [namespace loc msg & args]
+  ^String [namespace loc msg & args]
   (fmt loc (lookup namespace loc msg) (to-array args)))
 
 (defn translate-plural
   "Translate a message into the given locale, interpolating as
   needed. The count argument can be interpolated as {0}.  Messages are looked
   up in the resource bundle associated with the given namespace"
-  [namespace loc msgid msgid-plural count & args]
+  ^String [namespace loc msgid msgid-plural count & args]
   (fmt loc (lookup-plural namespace loc msgid msgid-plural count) (to-array (cons count args))))
 
 (defmacro tru
