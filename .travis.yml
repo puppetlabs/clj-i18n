@@ -1,8 +1,13 @@
 language: clojure
-lein: 2.7.1
-jdk:
-- openjdk7
-- oraclejdk8
+lein: 2.9.1
+jobs:
+  include:
+    - stage: jdk8
+      dist: xenial
+      jdk: openjdk8
+    - stage: jdk11
+      dist: bionic
+      jdk: openjdk11
 script: "./ext/travisci/test.sh"
 branches:
   only:
