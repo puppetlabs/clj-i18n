@@ -132,7 +132,7 @@ On Red Hat-based operating systems, including Fedora, install gettext via
 
 [![Clojars Project](https://img.shields.io/clojars/v/puppetlabs/i18n.svg)](https://clojars.org/puppetlabs/i18n)
 
-1. In your `project.clj`, add `[puppetlabs/i18n "0.5.0"]` to your project's
+1. In your `project.clj`, add `[puppetlabs/i18n "0.9.0"]` to your project's
    :plugins and :dependencies vectors (without the version number in
    :dependencies if your project uses clj-parent). Also add
    ```
@@ -140,8 +140,10 @@ On Red Hat-based operating systems, including Fedora, install gettext via
                                         (fn [new prev]
                                           (if (map? prev) [new prev] (conj prev new)))
                                         #(spit %1 (pr-str %2))]}
+   :prep-tasks [["i18n" "make"] "javac" "compile"]
    ```
-   to merge in the translation locales.clj from upstream projects.
+   to merge in the translation locales.clj from upstream projects and make sure the plugin is
+   invoked.
 2. Run `lein i18n init`. This will
    * put a `Makefile.i18n` into `dev-resources/` in your project and include it
      into an existing toplevel `Makefile` resp. create a new one that does that.
@@ -151,8 +153,6 @@ On Red Hat-based operating systems, including Fedora, install gettext via
      include your project name, so that the POT file will be named after your project.)
      These are used by [the clj-i18n CI job][ci-job]
      and can be ignored (they are added to the project's .gitignore file).
-   * add hooks to the `compile` task that will rebuild the resource bundles
-     (equivalent of running `make i18n`).
 3. **If there are namespaces/packages in your project with names which do not
    start with a prefix derived from the project name:** you'll need to list all
    of your namespaces/package name prefixes in the `PACKAGES` variable in the

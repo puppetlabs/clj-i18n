@@ -1,11 +1,11 @@
-(defproject puppetlabs/i18n "0.8.1-SNAPSHOT"
+(defproject puppetlabs/i18n "0.9.0-SNAPSHOT"
   :description "Clojure i18n library"
   :url "http://github.com/puppetlabs/clj-i18n"
   :license {:name "Apache License, Version 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0"}
 
   :pedantic? :abort
-  :dependencies [[org.clojure/clojure "1.6.0"]
+  :dependencies [[org.clojure/clojure "1.10.1"]
                  [cpath-clj "0.1.2"]
                  [org.gnu.gettext/libintl "0.18.3"]]
 
