@@ -10,8 +10,8 @@ which a huge amount of tooling exists.
 The `main.clj` and `example/program` in this repo contain some simple code
 that demonstrates how to use the translation functions. Before you can use
 it, you need to run `make` to generate the necessary
-`ResourceBundles`. After that, you can use `lein run` or `LANG=de_DE lein
-run` to look at English and German output.
+`ResourceBundles`. After that, you can use `lein run -m puppetlabs.i18n.main`
+or `LANG=de_DE lein run -m puppetlabs.i18n.main` to look at English and German output.
 
 ## Developer usage
 
