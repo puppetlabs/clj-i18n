@@ -1,8 +1,24 @@
 (ns puppetlabs.i18n.core-test
-  (:require [clojure.test :refer :all]
-            [puppetlabs.i18n.core :refer :all]
-            [clojure.java.io :as io]
-            [clojure.pprint :refer [pprint]]))
+  (:require
+   [clojure.java.io :as io]
+   [clojure.pprint :refer [pprint]]
+   [clojure.test :refer :all]
+   [puppetlabs.i18n.core
+    :refer [as-number
+            available-locales
+            bundle-for-namespace
+            info-map'
+            locale-negotiator
+            negotiate-locale
+            parse-http-accept-header
+            string-as-locale
+            system-locale
+            trs
+            trsn
+            tru
+            trun
+            user-locale
+            with-user-locale]]))
 
 ;; Set the JVM's default locale so we run in a known environment
 (. java.util.Locale setDefault (string-as-locale "en-US"))
