@@ -8,6 +8,16 @@ jobs:
     - stage: jdk11
       dist: bionic
       jdk: openjdk11
+    - stage: lint jdk11
+      dist: bionic
+      jdk: openjdk11
+      script: |
+        set -e
+        ./dev-setup
+        set -x
+        lein eastwood
+        lein check
+        set +x
 script: "./ext/travisci/test.sh"
 branches:
   only:
