@@ -158,9 +158,10 @@
                (str "Expected java.util.Locale but got "
                     (.getName (.getClass locale#))))))))
 
-(defn user-locale []
+(defn user-locale
   "Return the user's preferred locale. If none is set, return the system
-  locale"
+  locale."
+  []
   (or *locale* (system-locale)))
 
 ;; @todo lutter 2015-04-21: there are various formats of string locales
