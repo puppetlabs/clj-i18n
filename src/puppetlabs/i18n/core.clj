@@ -156,7 +156,7 @@
        (binding [*locale* locale#] ~@body)
        (throw (IllegalArgumentException.
                (str "Expected java.util.Locale but got "
-                    (.getName (.getClass locale#))))))))
+                    (.getName (class locale#))))))))
 
 (defn user-locale
   "Return the user's preferred locale. If none is set, return the system
@@ -183,7 +183,7 @@
   "Find the name of the ResourceBundle for the given namespace name"
   ([namespace]
    (bundle-for-namespace @info-map namespace))
-  ([i18n-info-map namespace]
+  ([i18n-info-map ^String namespace]
    (:bundle
     (get i18n-info-map
          (first (filter #(.startsWith namespace %)
@@ -196,9 +196,9 @@
 
 (defn get-bundle
   "Get the java.util.ResourceBundle for the given locale (a string)"
-  [namespace loc]
+  [namespace ^java.util.Locale loc]
   (try
-    (let [base-name (bundle-for-namespace namespace)]
+    (let [^String base-name (bundle-for-namespace namespace)]
       (and base-name
            (gnu.gettext.GettextResource/getBundle base-name loc)))
     (catch java.lang.NullPointerException e
