@@ -9,7 +9,7 @@
                  [cpath-clj "0.1.2"]
                  [org.gnu.gettext/libintl "0.18.3"]]
 
-  :profiles {:dev {:dependencies [[puppetlabs/kitchensink "2.1.0"
+  :profiles {:dev {:dependencies [[puppetlabs/kitchensink "3.1.3"
                                    :exclusions [org.clojure/clojure]]]
                    :plugins [[jonase/eastwood "0.8.1"
                               :exclusions [org.clojure/clojure]]]}}
