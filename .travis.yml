@@ -11,4 +11,4 @@ jobs:
 script: "./ext/travisci/test.sh"
 branches:
   only:
-    - master
+    - main
