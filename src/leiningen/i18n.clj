@@ -138,7 +138,12 @@
 (defn i18n-make
   [project]
   (l/info "Running 'make i18n'")
-  (sh "make" "i18n"))
+  (let [{:keys [exit out err]} (sh "make" "i18n")]
+    (print out)
+    (binding [*out* *err*]
+      (print err))
+    (when-not (zero? exit)
+      (l/abort))))
 
 (defn abort
   [& rest]
