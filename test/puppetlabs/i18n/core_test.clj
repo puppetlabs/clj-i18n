@@ -281,7 +281,8 @@
         (check "de" "de_DE, de;q=0.9, en;q=0.8")
         (check "oc" "it, fr"))
       (testing "falls back to system-locale for empty/invalid headers"
-        (map #(check "oc" %) ["" nil "en;q=garbage" ",,," ",;," "xyz" "de-US"])
+        (doseq [x ["" nil "en;q=garbage" ",,," ",;," "xyz" "de-US"]]
+          (check "oc" x))
         (is (= (system-locale) (neg {:headers {}})))
         (is (= (system-locale) (neg {}))))
       (testing "conveys the locale"
