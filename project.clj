@@ -10,7 +10,9 @@
                  [org.gnu.gettext/libintl "0.18.3"]]
 
   :profiles {:dev {:dependencies [[puppetlabs/kitchensink "2.1.0"
-                                   :exclusions [org.clojure/clojure]]]}}
+                                   :exclusions [org.clojure/clojure]]]
+                   :plugins [[jonase/eastwood "0.8.1"
+                              :exclusions [org.clojure/clojure]]]}}
 
   :deploy-repositories [["releases" {:url "https://clojars.org/repo"
                                      :username :env/clojars_jenkins_username
