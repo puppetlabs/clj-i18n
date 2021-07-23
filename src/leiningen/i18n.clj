@@ -7,7 +7,9 @@
             [clojure.pprint :as pprint]
             [clojure.string :as cstr]
             [clojure.java.shell :as sh :refer [sh]]
-            [cpath-clj.core :as cp]))
+            [cpath-clj.core :as cp])
+  (:import
+   (java.io File)))
 
 (defn help
   []
@@ -97,7 +99,7 @@
 (defn ensure-contains-line
   "Make sure that file contains the given line, if not append it. If file
   does not exist yet, create it and put line into it"
-  [file line]
+  [^File file line]
   (if (.isFile file)
     (let [contents (slurp file)]
       (if-not (.contains contents line)
@@ -136,7 +138,12 @@
 (defn i18n-make
   [project]
   (l/info "Running 'make i18n'")
-  (sh "make" "i18n"))
+  (let [{:keys [exit out err]} (sh "make" "i18n")]
+    (print out)
+    (binding [*out* *err*]
+      (print err))
+    (when-not (zero? exit)
+      (l/abort))))
 
 (defn abort
   [& rest]

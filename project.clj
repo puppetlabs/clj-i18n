@@ -9,10 +9,13 @@
                  [cpath-clj "0.1.2"]
                  [org.gnu.gettext/libintl "0.18.3"]]
 
-  :profiles {:dev {:dependencies [[puppetlabs/kitchensink "2.1.0"
-                                   :exclusions [org.clojure/clojure]]]}}
+  :profiles {:dev {:dependencies [[puppetlabs/kitchensink "3.1.3"
+                                   :exclusions [org.clojure/clojure]]]
+                   :plugins [[jonase/eastwood "0.8.1"
+                              :exclusions [org.clojure/clojure]]]}}
 
   :deploy-repositories [["releases" {:url "https://clojars.org/repo"
                                      :username :env/clojars_jenkins_username
                                      :password :env/clojars_jenkins_password
-                                     :sign-releases false}]])
+                                     :sign-releases false}]]
+  :eval-in-leiningen true)

@@ -7,5 +7,5 @@
    replacement. Uses RegExp's m flag (?m) so that ^/$ matches beginning of line."
   [s regex-match replacement]
   (cstr/replace-first s
-                      (re-pattern (str "(?m)^" (.toString regex-match) "$"))
+                      (re-pattern (str "(?m)^" (str regex-match) "$"))
                       replacement))

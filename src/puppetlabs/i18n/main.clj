@@ -14,7 +14,7 @@
   ;; This code ensures that translators never see this message since
   ;; xgettext doesn't see the string
   (let [dont-do-this "Current Locale: {0}"]
-    (println (tru dont-do-this (.toString (i18n/user-locale)))))
+    (println (tru dont-do-this (str (i18n/user-locale)))))
 
   ;; Very simple localization
   (println (trs "Welcome! This is localized"))

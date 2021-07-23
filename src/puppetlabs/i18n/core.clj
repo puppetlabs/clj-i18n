@@ -156,11 +156,12 @@
        (binding [*locale* locale#] ~@body)
        (throw (IllegalArgumentException.
                (str "Expected java.util.Locale but got "
-                    (.getName (.getClass locale#))))))))
+                    (.getName (class locale#))))))))
 
-(defn user-locale []
+(defn user-locale
   "Return the user's preferred locale. If none is set, return the system
-  locale"
+  locale."
+  []
   (or *locale* (system-locale)))
 
 ;; @todo lutter 2015-04-21: there are various formats of string locales
@@ -182,7 +183,7 @@
   "Find the name of the ResourceBundle for the given namespace name"
   ([namespace]
    (bundle-for-namespace @info-map namespace))
-  ([i18n-info-map namespace]
+  ([i18n-info-map ^String namespace]
    (:bundle
     (get i18n-info-map
          (first (filter #(.startsWith namespace %)
@@ -195,9 +196,9 @@
 
 (defn get-bundle
   "Get the java.util.ResourceBundle for the given locale (a string)"
-  [namespace loc]
+  [namespace ^java.util.Locale loc]
   (try
-    (let [base-name (bundle-for-namespace namespace)]
+    (let [^String base-name (bundle-for-namespace namespace)]
       (and base-name
            (gnu.gettext.GettextResource/getBundle base-name loc)))
     (catch java.lang.NullPointerException e
@@ -312,12 +313,13 @@
            (remove
             ;; q values can only have three decimal places; we need to
             ;; remove all q values that are 0
-            (fn [[lang q]] (< q 0.0001))
-            (for [choice (remove str/blank? (str/split (str header) #","))]
-              (let [[lang q] (str/split choice #";")]
-                [(str/trim lang)
-                 (or (when q (as-number (get (str/split q #"=") 1)))
-                     1)])))))
+            (fn [[lang q]] (or (not q) (< q 0.0001)))
+            (doall
+             (for [choice (remove str/blank? (str/split (str header) #","))]
+               (when-let [[lang q] (seq (str/split choice #";"))]
+                 [(str/trim lang)
+                  (or (when q (as-number (get (str/split q #"=") 1)))
+                      1)]))))))
 
 (defn negotiate-locale
   "Given a string sequence of wanted locale (sorted by preference) and a
@@ -335,9 +337,11 @@
   ;; For example, if we have locales #{"de" "es"} available, and the user
   ;; asks for ["de_AT" "fr"], we should probably return "de" rather than
   ;; falling back to the message locale
-  (if-let [loc (some available wanted)]
-    (string-as-locale loc)
-    (system-locale)))
+  (if-not (seq wanted)
+    (system-locale)
+    (if-let [loc (some available wanted)]
+      (string-as-locale loc)
+      (system-locale))))
 
 (defn locale-negotiator
   "Ring middleware that performs locale negotiation.
@@ -350,8 +354,8 @@
     ;; @todo lutter 2015-06-03: remove our hand-crafted language
     ;; negotiation and use java.util.Locale/filterTags instead; this would
     ;; remove the gnarly parse-http-accept-header business. Requires Java 8
-    (let [headers (:headers request)
-          parsed  (parse-http-accept-header (get headers "accept-language"))
+    (let [lang (get-in request [:headers "accept-language"] "")
+          parsed  (parse-http-accept-header lang)
           wanted  (mapv first parsed)
           negotiated (negotiate-locale wanted (available-locales))]
       (with-user-locale negotiated (handler request)))))
