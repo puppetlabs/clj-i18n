@@ -1,27 +1,27 @@
 (ns puppetlabs.i18n.core-test
   (:require
-   [clojure.java.io :as io]
-   [clojure.pprint :refer [pprint]]
-   [clojure.test :refer :all]
-   [puppetlabs.i18n.core
-    :refer [as-number
-            available-locales
-            bundle-for-namespace
-            info-map'
-            locale-negotiator
-            negotiate-locale
-            parse-http-accept-header
-            string-as-locale
-            system-locale
-            trs
-            trsn
-            tru
-            trun
-            user-locale
-            with-user-locale]]))
+    [clojure.java.io :as io]
+    [clojure.test :refer :all]
+    [puppetlabs.i18n.core
+     :refer [as-number
+             available-locales
+             bundle-for-namespace
+             info-map'
+             locale-negotiator
+             negotiate-locale
+             parse-http-accept-header
+             string-as-locale
+             system-locale
+             trs
+             trsn
+             tru
+             trun
+             user-locale
+             with-user-locale]])
+  (:import (java.util Locale)))
 
 ;; Set the JVM's default locale so we run in a known environment
-(. java.util.Locale setDefault (string-as-locale "en-US"))
+(. Locale setDefault (string-as-locale "en-US"))
 
 (def de (string-as-locale "de-DE"))
 (def eo (string-as-locale "eo"))
@@ -61,7 +61,14 @@
   (testing "tru in Esperanto"
     ;; We use Esperanto as our test locale
     (with-user-locale eo
-      (is (= welcome_eo (tru welcome_en))))))
+      (is (= welcome_eo (tru welcome_en)))))
+  (testing "multiple argument formatting not in the POT file"
+   (is (= "This is a format string with one, 2, three, 4 arguments" (trs "This is a format string with {0}, {1}, {2}, {3} arguments" "one" 2 "three" 4))))
+  (testing "multiple argument formatting"
+    (is (= "It took 5 programmers 10 months to implement this" (tru "It took {0} programmers {1} months to implement this" 5 10))))
+  (testing "multiple argument formatting with a user locale"
+    (with-user-locale de
+      (is (= "5 Programmierer brauchten 10 Monat(e) um das zu implementieren" (tru "It took {0} programmers {1} months to implement this" 5 10))))))
 
 (deftest test-trun
   (testing "trun with no user locale"
@@ -77,8 +84,14 @@
     (is (= welcome_en (trs welcome_en))))
   (testing "trs with a user locale"
     (with-user-locale de
-      (is (= welcome_en (trs welcome_en))))))
-
+      (is (= welcome_en (trs welcome_en)))))
+  (testing "multiple argument formatting not in the POT file"
+    (is (= "This is a format string with one, 2, three, 4 arguments" (trs "This is a format string with {0}, {1}, {2}, {3} arguments" "one" 2 "three" 4))))
+  (testing "multiple argument formatting"
+    (is (= "It took 5 programmers 10 months to implement this" (trs "It took {0} programmers {1} months to implement this" 5 10))))
+  (testing "multiple argument formatting with a user locale"
+    (with-user-locale de
+      (is (= "It took 5 programmers 10 months to implement this" (trs "It took {0} programmers {1} months to implement this" 5 10))))))
 
 (deftest test-trsn
   (testing "trsn with no user locale"

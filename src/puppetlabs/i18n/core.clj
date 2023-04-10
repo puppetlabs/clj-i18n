@@ -3,7 +3,10 @@
   (:require [clojure.java.io :as io]
             [clojure.set]
             [clojure.edn :as edn]
-            [clojure.string :as str]))
+            [clojure.string :as str])
+  (:import (gnu.gettext GettextResource)
+           (java.text MessageFormat)
+           (java.util Comparator Locale MissingResourceException)))
 
 ;;; General setup/info
 (defn info-files
@@ -11,9 +14,9 @@
   a seq of URLs"
   []
   (-> (Thread/currentThread)
-           .getContextClassLoader
-           (.getResources "locales.clj")
-           enumeration-seq))
+      .getContextClassLoader
+      (.getResources "locales.clj")
+      enumeration-seq))
 
 (defn parse-info-file
   "This function will handle the normal locales.clj file the Makefile builds in
@@ -48,12 +51,12 @@
            item
            (throw
              (Exception.
-               (format "Invalid locales info: %s: :locales must be a nonempty set"
-                       (:source item)))))
+               ^String (format "Invalid locales info: %s: :locales must be a nonempty set"
+                               (:source item)))))
          (throw
            (Exception.
-             (format "Invalid locales info: %s: missing :locales"
-                     (:source item))))))
+             ^String (format "Invalid locales info: %s: missing :locales"
+                             (:source item))))))
      (check-and-normalize-packages [item]
        (if-let [packages (:packages item)]
          (if (coll? packages)
@@ -61,22 +64,22 @@
                (dissoc :package))                           ; just to make sure we don't have both: :packages & :package
            (throw
              (Exception.
-               (format "Invalid locales info: %s: :packages must be a collection"
-                       (:source item)))))
+               ^String (format "Invalid locales info: %s: :packages must be a collection"
+                               (:source item)))))
          (if-let [package (:package item)]                  ; for backwards compatibility: transform :package to :packages
            (-> item
                (dissoc :package)
                (assoc :packages [package]))
            (throw
              (Exception.
-               (format "Invalid locales info: %s: missing :packages"
-                       (:source item)))))))]
+               ^String (format "Invalid locales info: %s: missing :packages"
+                               (:source item)))))))]
     (->> (info-files)
          (mapcat parse-info-file)
          (map (comp check-and-normalize-packages check-locales)))))
 
 (def string-length-comparator
-  (reify java.util.Comparator
+  (reify Comparator
     (compare [_ lhs rhs]
       (clojure.core/compare (count rhs) (count lhs)))))
 
@@ -100,10 +103,10 @@
                                (if (set? source-new) source-new #{source-new})))}
                   (throw
                    (Exception.
-                    (format "Invalid locales info: %s and %s are both for package %s but set different bundles %s and %s"
-                            (:source old) (:source new)
-                            package
-                            bundle-old bundle-new)))))
+                    ^String (format "Invalid locales info: %s and %s are both for package %s but set different bundles %s and %s"
+                                    (:source old) (:source new)
+                                    package
+                                    bundle-old bundle-new)))))
               new))]
     (reduce
      (fn [map item]
@@ -139,7 +142,7 @@
 (defn system-locale
   "Get the globally set locale"
   []
-  (. java.util.Locale getDefault))
+  (. Locale getDefault))
 
 (def ^:dynamic *locale*
   "The current user locale. You should not modify this variable
@@ -152,11 +155,11 @@
   "Evaluate body with the user locale set to locale"
   [locale & body]
   `(let [locale# ~locale]
-     (if (instance? java.util.Locale locale#)
+     (if (instance? Locale locale#)
        (binding [*locale* locale#] ~@body)
        (throw (IllegalArgumentException.
-               (str "Expected java.util.Locale but got "
-                    (.getName (class locale#))))))))
+               ^String (str "Expected java.util.Locale but got "
+                            (.getName (class locale#))))))))
 
 (defn user-locale
   "Return the user's preferred locale. If none is set, return the system
@@ -168,7 +171,7 @@
 ;; we need to make sure we have the right one. For example, "en_US" leads
 ;; to a bad locale, whereas "en-us" works
 (defn string-as-locale [loc]
-  (java.util.Locale/forLanguageTag loc))
+  (Locale/forLanguageTag loc))
 
 (defn message-locale
   "The locale of the untranslated messages. This is used as a fallback if
@@ -196,15 +199,15 @@
 
 (defn get-bundle
   "Get the java.util.ResourceBundle for the given locale (a string)"
-  [namespace ^java.util.Locale loc]
+  [namespace ^Locale loc]
   (try
     (let [^String base-name (bundle-for-namespace namespace)]
       (and base-name
-           (gnu.gettext.GettextResource/getBundle base-name loc)))
-    (catch java.lang.NullPointerException e
+           (GettextResource/getBundle base-name loc)))
+    (catch NullPointerException _e
       ;; base-name or loc were nil
       nil)
-    (catch java.util.MissingResourceException e
+    (catch MissingResourceException _e
       ;; no bundle for the base-name and/or locale
       nil)))
 
@@ -217,8 +220,8 @@
   (let [bundle (get-bundle namespace loc)]
     (if (and bundle (not-empty msg))
       (try
-        (gnu.gettext.GettextResource/gettext bundle msg)
-        (catch java.util.MissingResourceException e
+        (GettextResource/gettext bundle msg)
+        (catch MissingResourceException _e
           ;; no key for msg
           msg))
       msg)))
@@ -231,8 +234,8 @@
   (let [bundle (get-bundle namespace loc)]
     (if (and bundle (not-empty msgid))
       (try
-        (gnu.gettext.GettextResource/ngettext bundle msgid msgid-plural count)
-        (catch java.util.MissingResourceException e
+        (GettextResource/ngettext bundle msgid msgid-plural count)
+        (catch MissingResourceException e
           ;; no key for msg
           (if (= count 1) msgid msgid-plural)))
       (if (= count 1) msgid msgid-plural))))
@@ -248,7 +251,9 @@
   ([loc msg args]
    ;; we might want to cache these MessageFormat's in some way
    ;; maybe in a size-bounded LRU cache
-   (.format (new java.text.MessageFormat msg loc) (to-array args))))
+   (->(new MessageFormat msg loc)
+     (.format  (to-array args) (new StringBuffer) nil)
+     (.toString))))
 
 (defn translate
   "Translate a message into the given locale, interpolating as
