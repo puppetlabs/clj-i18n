@@ -84,7 +84,7 @@ $(LOCALES_CLJ): | resources
 .PHONY: clean-orphaned-bundles
 clean-orphaned-bundles:
 	@for bundle in resources/$(BUNDLE_DIR)/Messages_*.class; do                                  \
-	  locale=$$(basename "$$bundle" | sed -E -e 's/\$$?1?\.class$$/_class/' | cut -d '_' -f 2;); \
+	  locale=$$(basename "$$bundle" ".class" | sed -e 's/^Messages_//' | sed -e 's/\$$1//');     \
 	  if [ ! -f "locales/$$locale.po" -a -f "$$bundle" ]; then                                                    \
 	    rm "$$bundle";                                                                           \
 	  fi                                                                                         \
